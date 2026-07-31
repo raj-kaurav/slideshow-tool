@@ -26,6 +26,6 @@
     "src/lib/orientation.ts",
     "src/lib/aspectRatio.ts",
     "src/types/gallery.ts",
-    "scripts/**/*.ts"
+    "scripts/generate-gallery-manifest.ts"
   ]
 }
