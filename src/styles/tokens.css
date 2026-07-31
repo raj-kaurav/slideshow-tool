@@ -1,0 +1,69 @@
+/* Design tokens — Visual Language + Motion System
+   Do not scatter magic values in components; reference these tokens. */
+
+:root {
+  /* Color */
+  --bg: #0e0e0e;
+  --bg-elevated: #141414;
+  --viewer: #121212;
+  --toolbar: rgba(255, 255, 255, 0.04);
+  --hover-surface: rgba(255, 255, 255, 0.08);
+  --text: #f2f0eb;
+  --text-muted: rgba(242, 240, 235, 0.55);
+  --text-faint: rgba(242, 240, 235, 0.32);
+  --accent: #c8c2b6;
+  --border: rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(255, 255, 255, 0.14);
+  --disabled: rgba(242, 240, 235, 0.28);
+  --focus: #c8c2b6;
+  --danger-quiet: rgba(232, 180, 180, 0.85);
+
+  /* Typography */
+  --font-display: 'Instrument Serif', Georgia, 'Times New Roman', serif;
+  --font-ui: 'Outfit', system-ui, sans-serif;
+  --text-display: clamp(2.75rem, 6vw, 4.5rem);
+  --text-heading: clamp(1.25rem, 2vw, 1.75rem);
+  --text-body: 0.9375rem;
+  --text-body-lg: 1.0625rem;
+  --text-caption: 0.8125rem;
+  --text-metadata: 0.75rem;
+
+  /* Spacing */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+  --page-inset: clamp(16px, 3vw, 48px);
+  --gallery-gap: 10px;
+
+  /* Elevation */
+  --shadow-hover: 0 8px 24px rgba(0, 0, 0, 0.35);
+
+  /* Motion durations */
+  --motion-instant: 100ms;
+  --motion-fast: 180ms;
+  --motion-normal: 280ms;
+  --motion-slow: 450ms;
+  --motion-reveal-cell: 900ms;
+  --motion-assemble: 1500ms;
+  --motion-viewer-expand: 520ms;
+  --motion-viewer-close: 480ms;
+  --motion-toolbar: 200ms;
+  --motion-chrome-hide-delay: 2000ms;
+  --motion-chrome-fade: 180ms;
+  --motion-slideshow: 700ms;
+  --motion-counter: 200ms;
+  --motion-hover: 200ms;
+  --motion-stagger-min: 15ms;
+  --motion-stagger-max: 25ms;
+
+  /* Motion easings */
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-entrance: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-exit: cubic-bezier(0.4, 0, 1, 1);
+  --ease-slideshow: cubic-bezier(0.4, 0, 0.2, 1);
+}

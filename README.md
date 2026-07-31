@@ -39,4 +39,12 @@ A premium, offline-first photography viewing application.
 
 ## Status
 
-Production-grade product and engineering documentation is in place. Application implementation follows the [Implementation Playbook](docs/IMPLEMENTATION_PLAYBOOK.md) and [Architecture phases](docs/ARCHITECTURE.md#implementation-phases).
+- Documentation system complete
+- **Phase 1 (Scaffold)** implemented — Vite + React + TypeScript + Tailwind + Framer Motion + GSAP + Lenis, design tokens, fonts, providers, home shell
+
+```bash
+npm install
+npm run dev
+```
+
+Further phases: [Implementation Playbook](docs/IMPLEMENTATION_PLAYBOOK.md)
