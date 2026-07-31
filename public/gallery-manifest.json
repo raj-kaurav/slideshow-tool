@@ -1,0 +1,76 @@
+{
+  "meta": {
+    "version": 1,
+    "generatedAt": "2026-07-31T09:49:17.362Z",
+    "itemCount": 5
+  },
+  "collection": {
+    "title": "Sample Collection",
+    "description": "Development photographs for Gallery Experience.",
+    "location": "Local",
+    "dateRange": "2026",
+    "photographer": "Gallery Experience"
+  },
+  "items": [
+    {
+      "id": "img_fe4de5bd",
+      "src": "/gallery/landscapes/coastline.png",
+      "filename": "coastline.png",
+      "relativePath": "landscapes/coastline.png",
+      "width": 960,
+      "height": 540,
+      "orientation": "landscape",
+      "aspectRatio": 1.777778,
+      "bytes": 2428,
+      "mtime": 1785491260535.8584
+    },
+    {
+      "id": "img_8f29e0d8",
+      "src": "/gallery/landscapes/ridge-panorama.png",
+      "filename": "ridge-panorama.png",
+      "relativePath": "landscapes/ridge-panorama.png",
+      "width": 1600,
+      "height": 400,
+      "orientation": "panorama",
+      "aspectRatio": 4,
+      "bytes": 2555,
+      "mtime": 1785491260535.8584
+    },
+    {
+      "id": "img_a93089fa",
+      "src": "/gallery/landscapes/valley.png",
+      "filename": "valley.png",
+      "relativePath": "landscapes/valley.png",
+      "width": 800,
+      "height": 500,
+      "orientation": "landscape",
+      "aspectRatio": 1.6,
+      "bytes": 1945,
+      "mtime": 1785491260535.8584
+    },
+    {
+      "id": "img_77bff6e9",
+      "src": "/gallery/portraits/figure.png",
+      "filename": "figure.png",
+      "relativePath": "portraits/figure.png",
+      "width": 420,
+      "height": 640,
+      "orientation": "portrait",
+      "aspectRatio": 0.65625,
+      "bytes": 1678,
+      "mtime": 1785491260535.8584
+    },
+    {
+      "id": "img_bc54243b",
+      "src": "/gallery/square-study.png",
+      "filename": "square-study.png",
+      "relativePath": "square-study.png",
+      "width": 512,
+      "height": 512,
+      "orientation": "square",
+      "aspectRatio": 1,
+      "bytes": 1497,
+      "mtime": 1785491260535.8584
+    }
+  ]
+}
