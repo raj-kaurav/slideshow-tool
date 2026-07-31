@@ -11,7 +11,7 @@ Principles: [PROJECT_PRINCIPLES.md](./PROJECT_PRINCIPLES.md)
 
 **Goal:** A production-quality offline photography viewing application with Gallery-first home, Wave Reveal, Dark Room Viewer, and exhibition Slideshow.
 
-**Progress:** Phases 1–2 complete; Phase **3A** (justified layout engine) complete. Phase 3B+ pending — see [IMPLEMENTATION_PLAYBOOK.md](./IMPLEMENTATION_PLAYBOOK.md).
+**Progress:** Phases 1–2 complete; Phase **3A–3B** complete (layout engine + virtualized wall). Phase 3C+ pending — see [IMPLEMENTATION_PLAYBOOK.md](./IMPLEMENTATION_PLAYBOOK.md).
 
 ### Features
 

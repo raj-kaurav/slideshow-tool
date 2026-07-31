@@ -48,16 +48,22 @@ Split in practice:
 | **Deliverables** | `src/lib/justified.ts`, `layoutBreakpoints.ts`, `layoutMath.ts`, `layoutValidate.ts`, `types/layout.ts`; HomePage debug summary |
 | **Non-goals** | ImageCard, virtualization, wave reveal, rendering wall |
 
-### Phase 3B — Wall rendering (pending)
+### Phase 3B — Wall rendering
 
 | | |
 |---|---|
-| **Goals** | Justified layout, placeholders, virtualization, priority wave, ImageCard skeletons |
-| **Success criteria** | Zero CLS; interactive during reveal; ≥50 FPS scroll on laptop with large fixture; assemble ~1.5s |
-| **Deliverables** | `JustifiedGallery`, `ImageCard`, `useWaveReveal`, row virtualizer |
-| **Common mistakes** | Animating layout positions; waiting for GSAP to finish before clicks; masonry; mount-all images |
-| **Review checklist** | Motion tokens; Animation Spec Gallery Reveal; Performance budgets; reduced motion |
-| **Expected commits** | `feat: virtualized gallery wall` → `feat: priority wave reveal` |
+| **Status** | **Complete** |
+| **Goals** | Render justified layout with row virtualization; reserved geometry; responsive recompute |
+| **Deliverables** | `JustifiedGallery`, `GalleryRow`, `GalleryCell`; `@tanstack/react-virtual` window virtualizer |
+| **Non-goals** | Wave reveal, hover, ImageCard interactions, blur-up, viewer, toolbar |
+| **Success criteria** | Smooth scroll; ResizeObserver-driven layout; semantic list; typecheck/build pass |
+
+### Phase 3C — ImageCard / reveal polish (pending)
+
+| | |
+|---|---|
+| **Goals** | ImageCard behaviour, wave reveal, placeholders polish as specified in Experience docs |
+| **Expected commits** | `feat: image card` → `feat: priority wave reveal` |
 
 ---
 

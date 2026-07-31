@@ -111,16 +111,19 @@ Component behaviour: [COMPONENT_GUIDELINES.md](./COMPONENT_GUIDELINES.md).
 
 ## Component tree (structural)
 
-**Phase 1 (current):**
+**Phase 1 (current → through 3B):**
 
 ```text
 App
-├── CursorProvider          # context/CursorContext.tsx
-├── GalleryProvider         # context/GalleryContext.tsx
-├── ViewerProvider          # context/ViewerContext.tsx
-├── LenisRoot               # components/LenisRoot.tsx
-└── HomePage                # pages/HomePage.tsx
-    └── CollectionHeader    # components/brand/CollectionHeader.tsx
+├── CursorProvider
+├── GalleryProvider
+├── ViewerProvider
+├── LenisRoot
+└── HomePage                      # pages/HomePage.tsx
+    ├── CollectionHeader
+    └── JustifiedGallery          # components/gallery/JustifiedGallery.tsx
+        ├── GalleryRow            # virtualized rows
+        └── GalleryCell           # reserved geometry (+ img)
 ```
 
 **Target V1 (later phases):**
@@ -134,7 +137,7 @@ App
 ├── HomePage
 │   ├── CollectionHeader
 │   ├── GalleryToolbar          # deferred visibility
-│   └── JustifiedGallery        # virtualized rows + wave
+│   └── JustifiedGallery        # + wave reveal / ImageCard behaviour
 └── ViewerPortal
     └── FullscreenViewer
         ├── ExpandingImage
@@ -213,7 +216,7 @@ Derived filtered/sorted lists via `useMemo` (sort helpers in `lib/sort.ts`; UI w
 | Framer Motion | Shared-element open/close, UI chrome, counter digits, toolbar fade |
 | GSAP | Wave reveal, ambient parallax, breathing, cinematic loading beats |
 | Lenis | Smooth scrolling; restore continuity |
-| React Virtual | Row windowing |
+| React Virtual | Row windowing via `useWindowVirtualizer` in `JustifiedGallery` |
 | exifr | Lazy EXIF when sidebar opens |
 | Three.js | **Not in V1** |
 
@@ -318,7 +321,7 @@ Sequence unchanged — experience details live in other docs. Guidance: [IMPLEME
 
 1. **Done** — Scaffold + tokens/fonts + providers + Lenis shell  
 2. **Done** — Manifest plugin + types + sample images + collection meta fields  
-3. **3A done / 3B pending** — Justified layout engine (geometry); wall rendering + wave next  
+3. **3A–3B done / 3C pending** — Justified layout engine + virtualized wall; wave/ImageCard next  
 4. Deferred toolbar (search, sort, favorites)  
 5. Dark-room viewer + shared-element + wall desaturate + dominant tint  
 6. Nav + N±1 preload + slide-fades + animated counter  
