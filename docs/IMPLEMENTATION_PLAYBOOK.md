@@ -11,12 +11,13 @@ Each phase below lists goals, success criteria, deliverables, common mistakes, r
 
 | | |
 |---|---|
-| **Goals** | Vite + React + TS + Tailwind + Framer Motion + GSAP + Lenis; fonts; token CSS bridge |
-| **Success criteria** | App boots; tokens importable; Lenis scrolls a blank shell; strict TS on |
-| **Deliverables** | Project skeleton, `styles/tokens.css`, font loading, base providers shell |
-| **Common mistakes** | Adding Three.js; Inter font; skipping token file; giant `App.tsx` |
+| **Status** | **Complete** |
+| **Goals** | Vite + React + TS + Tailwind v4 + Framer Motion + GSAP + Lenis; fonts; token CSS bridge; providers |
+| **Success criteria** | App boots; tokens importable; Lenis scrolls a blank shell; strict TS on; typecheck/build pass |
+| **Deliverables (as shipped)** | Repo-root Vite app; `src/styles/tokens.css` + `globals.css`; `@fontsource` fonts; `CursorProvider` / `GalleryProvider` / `ViewerProvider`; `components/LenisRoot.tsx`; `pages/HomePage.tsx` + `CollectionHeader`; UI primitives; oxlint + Prettier |
+| **Common mistakes** | Adding Three.js; Inter font; skipping token file; giant `App.tsx`; inventing gallery/viewer stubs |
 | **Review checklist** | Stack matches Architecture; Visual Language fonts; no forbidden libs |
-| **Expected commits** | `chore: scaffold vite react app` → `style: add design tokens and fonts` |
+| **Commits** | `chore: scaffold Phase 1 Vite React application` (+ prettier ignore) |
 
 ---
 

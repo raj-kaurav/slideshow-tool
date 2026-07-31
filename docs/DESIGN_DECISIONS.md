@@ -117,6 +117,39 @@
 
 ---
 
+## Why Tailwind CSS v4 (no `tailwind.config.ts`)
+
+| | |
+|---|---|
+| **Decision** | Tailwind v4 with `@tailwindcss/vite`; tokens live in `src/styles/tokens.css` + `@theme` in `globals.css` |
+| **Reason** | Matches current Vite scaffold; keeps design tokens in CSS (Visual Language) without a parallel JS config |
+| **Tradeoffs** | Contributors familiar with v3 config files need a short adjustment |
+| **Alternatives** | Tailwind v3 + `tailwind.config.ts` |
+
+---
+
+## Why oxlint (not ESLint)
+
+| | |
+|---|---|
+| **Decision** | Use **oxlint** from the Vite React-TS template; Prettier for formatting |
+| **Reason** | Fast default from scaffold; sufficient for Phase 1 conventions |
+| **Tradeoffs** | Different rule ecosystem than ESLint; may revisit if team needs ESLint plugins |
+| **Alternatives** | ESLint + typescript-eslint flat config |
+
+---
+
+## Why `pages/HomePage.tsx` and `components/LenisRoot.tsx`
+
+| | |
+|---|---|
+| **Decision** | Top-level screen in `src/pages/`; Lenis shell at `src/components/LenisRoot.tsx` (not under `cursor/`) |
+| **Reason** | HomePage is a screen, not a brand/gallery widget; Lenis is app chrome, not cursor behaviour |
+| **Tradeoffs** | Extra top-level folder (`pages/`) beyond the original nested-component-only sketch |
+| **Alternatives** | `components/HomePage.tsx`; Lenis under `components/cursor/` |
+
+---
+
 ## Why no Three.js / heavy WebGL in V1
 
 | | |

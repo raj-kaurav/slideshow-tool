@@ -23,16 +23,18 @@ Counts exclude imports and pure type blocks. Prefer clarity over gaming the limi
 
 | Path | Owns |
 |---|---|
+| `pages/` | Route-level / top-level screens (`HomePage.tsx`) |
+| `components/LenisRoot.tsx` | Lenis smooth-scroll shell (app-level; not under `cursor/`) |
 | `components/brand/` | Collection header / title presentation |
 | `components/gallery/` | Wall, cards, toolbar |
 | `components/viewer/` | Dark room, chrome, zoom, slideshow UI |
-| `components/cursor/` | Desktop cursor affordances |
-| `components/ui/` | Shared primitives (buttons, skeleton, counter) |
+| `components/cursor/` | Desktop cursor affordances (Phase 10+) |
+| `components/ui/` | Shared primitives (buttons, skeleton, focus ring, counter) |
 | `hooks/` | Reusable stateful logic |
-| `context/` | Providers only — thin orchestration |
-| `lib/` | Pure utilities (layout, sort, color, storage) |
+| `context/` | Providers only — thin orchestration (`*Context.tsx`) |
+| `lib/` | Pure utilities (layout, sort, color, storage, motion tokens) |
 | `types/` | Shared domain types |
-| `styles/` | Global CSS + token bridges |
+| `styles/` | `tokens.css` + `globals.css` (Tailwind v4 entry) |
 | `vite-plugins/` | Build-time gallery tooling |
 | `docs/` | Product & engineering documentation |
 
@@ -115,24 +117,38 @@ Budgets: [ARCHITECTURE.md](./ARCHITECTURE.md#performance-budgets-targets).
 
 ## TypeScript standards
 
-- `strict` true; no implicit `any`  
+- `strict` true; `noImplicitAny`; prefer `noUncheckedIndexedAccess` (enabled in `tsconfig.app.json`)  
 - Avoid `any`; use `unknown` + narrow  
 - Shared domain types in `types/`; do not duplicate interfaces across features  
 - Prefer utility types (`Pick`, `Omit`, `Readonly`) over copy-paste  
 - Prefer **string unions** over numeric enums for public APIs; const objects when needed  
 - Naming: `PascalCase` types/interfaces; `T` prefixes discouraged; boolean props `is`/`has`/`should`  
+- Path alias: `@/*` → `src/*` (Vite `resolve.alias` + `tsconfig.app.json` `paths`; `baseUrl` retained with `ignoreDeprecations: "6.0"` for TypeScript 6)  
+- `verbatimModuleSyntax` — use `import type` for type-only imports  
 
 ---
 
 ## Styling standards
 
-- **Tailwind** for layout/spacing/typography utilities mapped to tokens where possible  
-- **CSS** (`styles/tokens.css`, globals) for design tokens, keyframes bridges, Lenis/base  
+- **Tailwind CSS v4** via `@tailwindcss/vite` — **no** `tailwind.config.ts`  
+- Entry: `src/styles/globals.css` (`@import 'tailwindcss'`, `@theme` bridges, `@layer base`)  
+- **CSS tokens** in `src/styles/tokens.css`; TS mirrors for motion in `src/lib/motion.ts`  
 - **Tokens only** for color, space, motion duration — no scattered magic hex/px for design values  
 - Spacing from the spacing scale in [VISUAL_LANGUAGE.md](./VISUAL_LANGUAGE.md)  
 - Responsive: mobile-first; match Architecture breakpoints behaviour  
-- **No magic numbers** for motion — import [MOTION_SYSTEM.md](./MOTION_SYSTEM.md) tokens  
+- **No magic numbers** for motion — import [MOTION_SYSTEM.md](./MOTION_SYSTEM.md) / `lib/motion.ts` tokens  
 
+---
+
+## Tooling
+
+| Tool | Command / note |
+|---|---|
+| Dev server | `npm run dev` |
+| Production build | `npm run build` (`tsc -b && vite build`) |
+| Typecheck | `npm run typecheck` |
+| Lint | `npm run lint` → **oxlint** (not ESLint) |
+| Format | `npm run format` / `npm run format:check` → Prettier |
 ---
 
 ## Code quality

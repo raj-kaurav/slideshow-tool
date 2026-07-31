@@ -40,11 +40,19 @@ A premium, offline-first photography viewing application.
 ## Status
 
 - Documentation system complete
-- **Phase 1 (Scaffold)** implemented — Vite + React + TypeScript + Tailwind + Framer Motion + GSAP + Lenis, design tokens, fonts, providers, home shell
+- **Phase 1 (Scaffold)** complete — Vite 8 + React 19 + TypeScript strict + **Tailwind CSS v4** + Framer Motion + GSAP + Lenis; design tokens; `@fontsource` fonts; providers; `pages/HomePage` shell; **oxlint** + Prettier
 
 ```bash
 npm install
 npm run dev
 ```
+
+| Script | Purpose |
+|---|---|
+| `npm run dev` | Vite dev server |
+| `npm run build` | `tsc -b` + production build |
+| `npm run typecheck` | TypeScript project build check |
+| `npm run lint` | oxlint |
+| `npm run format` | Prettier write |
 
 Further phases: [Implementation Playbook](docs/IMPLEMENTATION_PLAYBOOK.md)

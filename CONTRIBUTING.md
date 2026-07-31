@@ -46,7 +46,8 @@ Highlights:
 - Interaction never waits on animation  
 - Preload N±1 only in the Viewer  
 - Small files; correct folder ownership  
-
+- Lint with **oxlint** (`npm run lint`); format with **Prettier**  
+- Path imports via `@/` (see `vite.config.ts` / `tsconfig.app.json`)
 ---
 
 ## Commit expectations

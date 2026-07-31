@@ -7,8 +7,9 @@
 > Components → [COMPONENT_GUIDELINES.md](./COMPONENT_GUIDELINES.md)  
 > Interactions → [INTERACTION_INVENTORY.md](./INTERACTION_INVENTORY.md)
 
-**Stack:** Vite · React · TypeScript · TailwindCSS · Framer Motion · GSAP · Lenis · React Icons  
-**Data:** Offline files in `public/gallery/` + generated manifest · no backend · Context + `localStorage`
+**Stack:** Vite 8 · React 19 · TypeScript (strict) · Tailwind CSS v4 · Framer Motion · GSAP · Lenis · React Icons  
+**Data:** Offline files in `public/gallery/` + generated manifest · no backend · Context + `localStorage`  
+**Tooling:** oxlint · Prettier · `@` path alias · `@fontsource` (Instrument Serif, Outfit)
 
 ---
 
@@ -59,20 +60,46 @@ Offline-first: drop images into `public/gallery/` → plugin regenerates manifes
 
 ## Folder structure
 
+Repository root **is** the application (package name `gallery-experience`). Structure as implemented:
+
 ```text
-gallery-experience/
-├── public/gallery/                 # Drop images here
-├── public/gallery-manifest.json    # Generated
-├── docs/                           # Product documentation system
-├── scripts/generate-gallery-manifest.ts
+.
+├── public/
+│   ├── gallery/                      # Drop images here
+│   ├── gallery-manifest.json         # Generated (Phase 2+)
+│   └── favicon.svg
+├── docs/                             # Product documentation system
+├── scripts/                          # Manifest helpers (Phase 2+)
+├── index.html
+├── package.json
+├── vite.config.ts                    # React + Tailwind v4 plugin, `@` alias
+├── tsconfig.json                     # Project references
+├── tsconfig.app.json                 # App TS (strict, paths)
+├── tsconfig.node.json                # Vite config TS
+├── .prettierrc.json
 └── src/
-    ├── components/{brand,cursor,gallery,ui,viewer}/
-    ├── hooks/
+    ├── main.tsx
+    ├── App.tsx
+    ├── pages/
+    │   └── HomePage.tsx
+    ├── components/
+    │   ├── LenisRoot.tsx             # Smooth scroll shell
+    │   ├── brand/CollectionHeader.tsx
+    │   ├── cursor/                   # Custom cursor (later)
+    │   ├── gallery/                  # Wall, cards, toolbar (later)
+    │   ├── viewer/                   # Dark room (later)
+    │   └── ui/                       # IconButton, Skeleton, FocusRing, …
     ├── context/
-    ├── lib/
-    ├── types/
+    │   ├── CursorContext.tsx
+    │   ├── GalleryContext.tsx
+    │   └── ViewerContext.tsx
+    ├── hooks/                        # useMediaQuery, useLocalStorage, …
+    ├── lib/                          # motion tokens, storage, …
+    ├── types/                        # gallery.ts, viewer.ts
     ├── styles/
-    └── vite-plugins/galleryManifest.ts
+    │   ├── tokens.css                # Design + motion CSS variables
+    │   └── globals.css               # Tailwind import + @theme + base
+    └── vite-plugins/                 # galleryManifest (Phase 2+)
 ```
 
 Component behaviour: [COMPONENT_GUIDELINES.md](./COMPONENT_GUIDELINES.md).
@@ -81,10 +108,25 @@ Component behaviour: [COMPONENT_GUIDELINES.md](./COMPONENT_GUIDELINES.md).
 
 ## Component tree (structural)
 
+**Phase 1 (current):**
+
+```text
+App
+├── CursorProvider          # context/CursorContext.tsx
+├── GalleryProvider         # context/GalleryContext.tsx
+├── ViewerProvider          # context/ViewerContext.tsx
+├── LenisRoot               # components/LenisRoot.tsx
+└── HomePage                # pages/HomePage.tsx
+    └── CollectionHeader    # components/brand/CollectionHeader.tsx
+```
+
+**Target V1 (later phases):**
+
 ```text
 App
 ├── CursorProvider
 ├── GalleryProvider
+├── ViewerProvider
 ├── LenisRoot
 ├── HomePage
 │   ├── CollectionHeader
@@ -100,6 +142,22 @@ App
 ```
 
 Experience behaviours (reveal, tint, deferred toolbar, etc.) are specified in Experience / Animation docs — not restated here.
+
+---
+
+## Tooling & configuration (Phase 1)
+
+| Area | Implementation |
+|---|---|
+| **Bundler** | Vite 8 (`vite.config.ts`) with `@vitejs/plugin-react` |
+| **CSS** | Tailwind CSS **v4** via `@tailwindcss/vite` (no `tailwind.config.ts`); tokens in `src/styles/tokens.css`; `@import 'tailwindcss'` + `@theme` in `globals.css` |
+| **Lint** | **oxlint** (`npm run lint` → `oxlint src`) — not ESLint |
+| **Format** | Prettier (`npm run format` / `format:check`) |
+| **TypeScript** | Project references; `tsconfig.app.json` with `strict`, `noImplicitAny`, `noUncheckedIndexedAccess`, path alias `@/*` → `src/*`, `ignoreDeprecations: "6.0"` for `baseUrl` |
+| **Fonts** | `@fontsource/instrument-serif`, `@fontsource/outfit` imported in `main.tsx` |
+| **Scripts** | `dev`, `build` (`tsc -b && vite build`), `preview`, `typecheck`, `lint`, `format`, `format:check` |
+
+Motion/animation libraries (Framer Motion, GSAP) and React Icons are installed; usage begins in later phases. Lenis is wired in `LenisRoot` and disabled under `prefers-reduced-motion`.
 
 ---
 
@@ -249,9 +307,9 @@ Collections · Albums · Timeline · Map View · AI / colour / face search · Cl
 
 ## Implementation phases
 
-Unchanged sequence — experience details live in other docs:
+Sequence unchanged — experience details live in other docs. Guidance: [IMPLEMENTATION_PLAYBOOK.md](./IMPLEMENTATION_PLAYBOOK.md).
 
-1. Scaffold + tokens/fonts + Lenis/Framer/GSAP  
+1. **Done** — Scaffold + tokens/fonts + providers + Lenis shell  
 2. Manifest plugin + types + sample images + collection meta fields  
 3. Justified layout + placeholders + virtualization + wave reveal + ImageCard  
 4. Deferred toolbar (search, sort, favorites)  
