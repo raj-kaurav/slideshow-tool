@@ -37,14 +37,27 @@ Each phase below lists goals, success criteria, deliverables, common mistakes, r
 
 ## Phase 3 — Justified wall + wave reveal
 
+Split in practice:
+
+### Phase 3A — Layout engine (geometry only)
+
+| | |
+|---|---|
+| **Status** | **Complete** |
+| **Goals** | Pure justified layout algorithm; types; validation; container-width breakpoints |
+| **Deliverables** | `src/lib/justified.ts`, `layoutBreakpoints.ts`, `layoutMath.ts`, `layoutValidate.ts`, `types/layout.ts`; HomePage debug summary |
+| **Non-goals** | ImageCard, virtualization, wave reveal, rendering wall |
+
+### Phase 3B — Wall rendering (pending)
+
 | | |
 |---|---|
 | **Goals** | Justified layout, placeholders, virtualization, priority wave, ImageCard skeletons |
 | **Success criteria** | Zero CLS; interactive during reveal; ≥50 FPS scroll on laptop with large fixture; assemble ~1.5s |
-| **Deliverables** | `justified` lib, `JustifiedGallery`, `ImageCard`, `useWaveReveal`, row virtualizer |
+| **Deliverables** | `JustifiedGallery`, `ImageCard`, `useWaveReveal`, row virtualizer |
 | **Common mistakes** | Animating layout positions; waiting for GSAP to finish before clicks; masonry; mount-all images |
 | **Review checklist** | Motion tokens; Animation Spec Gallery Reveal; Performance budgets; reduced motion |
-| **Expected commits** | `feat: justified layout engine` → `feat: virtualized gallery wall` → `feat: priority wave reveal` |
+| **Expected commits** | `feat: virtualized gallery wall` → `feat: priority wave reveal` |
 
 ---
 

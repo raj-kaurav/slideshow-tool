@@ -42,6 +42,7 @@ A premium, offline-first photography viewing application.
 - Documentation system complete
 - **Phase 1 (Scaffold)** complete — Vite 8 + React 19 + TypeScript strict + **Tailwind CSS v4** + Framer Motion + GSAP + Lenis; design tokens; `@fontsource` fonts; providers; `pages/HomePage` shell; **oxlint** + Prettier
 - **Phase 2 (Manifest)** complete — Vite plugin scans `public/gallery/`, writes `gallery-manifest.json`; `GalleryProvider` loads it; optional `public/gallery.json` collection meta
+- **Phase 3A (Layout engine)** complete — pure justified geometry (`computeGalleryLayout`); HomePage shows row/height debug summary only
 
 ```bash
 npm install
