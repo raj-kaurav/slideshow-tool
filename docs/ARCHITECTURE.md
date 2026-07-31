@@ -17,13 +17,23 @@
 | Document | Responsibility |
 |---|---|
 | **ARCHITECTURE** (this file) | System structure, data flow, performance, a11y engineering, phases |
-| EXPERIENCE_DESIGN | Emotional journey & interaction feel |
-| VISUAL_LANGUAGE | Design system tokens |
-| MOTION_SYSTEM | Motion tokens, easing, rules |
-| ANIMATION_SPEC | Per-interaction animation sequences |
-| INTERACTION_INVENTORY | Master interaction catalogue |
-| COMPONENT_GUIDELINES | Component behaviour boundaries |
-| DESIGN_DECISIONS | Product decision log |
+| [PROJECT_PRINCIPLES](./PROJECT_PRINCIPLES.md) | Long-term product philosophy |
+| [PRODUCT_GLOSSARY](./PRODUCT_GLOSSARY.md) | Canonical terminology |
+| [EXPERIENCE_DESIGN](./EXPERIENCE_DESIGN.md) | Emotional journey & interaction feel |
+| [VISUAL_LANGUAGE](./VISUAL_LANGUAGE.md) | Design system tokens |
+| [MOTION_SYSTEM](./MOTION_SYSTEM.md) | Motion tokens, easing, rules |
+| [ANIMATION_SPEC](./ANIMATION_SPEC.md) | Per-interaction animation sequences |
+| [INTERACTION_INVENTORY](./INTERACTION_INVENTORY.md) | Master interaction catalogue |
+| [UI_PATTERNS](./UI_PATTERNS.md) | Reusable UI patterns |
+| [COMPONENT_GUIDELINES](./COMPONENT_GUIDELINES.md) | Component behaviour boundaries |
+| [DESIGN_DECISIONS](./DESIGN_DECISIONS.md) | Product decision log |
+| [ENGINEERING_STANDARDS](./ENGINEERING_STANDARDS.md) | Engineering conventions |
+| [IMPLEMENTATION_PLAYBOOK](./IMPLEMENTATION_PLAYBOOK.md) | Phase implementation guidance |
+| [FEATURE_LIFECYCLE](./FEATURE_LIFECYCLE.md) | Idea → maintenance |
+| [QUALITY_CHECKLIST](./QUALITY_CHECKLIST.md) | Merge gate |
+| [TESTING_STRATEGY](./TESTING_STRATEGY.md) | Testing philosophy |
+| [ROADMAP](./ROADMAP.md) | Versioned product direction |
+| [CONTRIBUTING](../CONTRIBUTING.md) | Contributor guide |
 
 Avoid duplicating experience/motion prose here — link instead.
 

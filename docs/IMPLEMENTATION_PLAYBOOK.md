@@ -1,0 +1,144 @@
+# Implementation Playbook
+
+> Guidance for implementing roadmap phases — **documentation only**, not application code.  
+> Phases: [ARCHITECTURE.md](./ARCHITECTURE.md#implementation-phases) · Standards: [ENGINEERING_STANDARDS.md](./ENGINEERING_STANDARDS.md)
+
+Each phase below lists goals, success criteria, deliverables, common mistakes, review checklist, and expected commit shape.
+
+---
+
+## Phase 1 — Scaffold
+
+| | |
+|---|---|
+| **Goals** | Vite + React + TS + Tailwind + Framer Motion + GSAP + Lenis; fonts; token CSS bridge |
+| **Success criteria** | App boots; tokens importable; Lenis scrolls a blank shell; strict TS on |
+| **Deliverables** | Project skeleton, `styles/tokens.css`, font loading, base providers shell |
+| **Common mistakes** | Adding Three.js; Inter font; skipping token file; giant `App.tsx` |
+| **Review checklist** | Stack matches Architecture; Visual Language fonts; no forbidden libs |
+| **Expected commits** | `chore: scaffold vite react app` → `style: add design tokens and fonts` |
+
+---
+
+## Phase 2 — Manifest plugin
+
+| | |
+|---|---|
+| **Goals** | Scan `public/gallery`; emit manifest; types; sample images; collection meta fields |
+| **Success criteria** | Adding a file regenerates manifest in dev; dimensions present; app can read JSON |
+| **Deliverables** | Vite plugin, `GalleryItem` types, sample photos, optional collection meta schema |
+| **Common mistakes** | Runtime directory listing in the browser; blocking UI thread on huge sync scans without care |
+| **Review checklist** | Offline; schema documented; Glossary terms (`Manifest`, `Photograph`) |
+| **Expected commits** | `feat: gallery manifest vite plugin` → `chore: add sample gallery images` |
+
+---
+
+## Phase 3 — Justified wall + wave reveal
+
+| | |
+|---|---|
+| **Goals** | Justified layout, placeholders, virtualization, priority wave, ImageCard skeletons |
+| **Success criteria** | Zero CLS; interactive during reveal; ≥50 FPS scroll on laptop with large fixture; assemble ~1.5s |
+| **Deliverables** | `justified` lib, `JustifiedGallery`, `ImageCard`, `useWaveReveal`, row virtualizer |
+| **Common mistakes** | Animating layout positions; waiting for GSAP to finish before clicks; masonry; mount-all images |
+| **Review checklist** | Motion tokens; Animation Spec Gallery Reveal; Performance budgets; reduced motion |
+| **Expected commits** | `feat: justified layout engine` → `feat: virtualized gallery wall` → `feat: priority wave reveal` |
+
+---
+
+## Phase 4 — Deferred toolbar
+
+| | |
+|---|---|
+| **Goals** | Search, sort, favorites; toolbar hidden until scroll/interact/shortcut/top hover |
+| **Success criteria** | First paint chrome-minimal; `/` or shortcut focuses search; favorites persist |
+| **Deliverables** | `GalleryToolbar`, `useDeferredToolbar`, `useFavorites`, sort helpers |
+| **Common mistakes** | Always-visible dashboard bar; search without debounce; blocking main thread on filter |
+| **Review checklist** | Experience deferred toolbar; a11y labels; Inventory rows |
+| **Expected commits** | `feat: deferred gallery toolbar` → `feat: favorites localStorage` |
+
+---
+
+## Phase 5 — Dark room viewer + shared element
+
+| | |
+|---|---|
+| **Goals** | Open/close FLIP; wall desaturate; dominant tint; viewer shell |
+| **Success criteria** | Spatial continuity; tint 3–5%; Esc reverse close; focus trap |
+| **Deliverables** | `FullscreenViewer`, `ExpandingImage`, `BackgroundLayer`, `useDominantColor` |
+| **Common mistakes** | Center fade modal; pure `#000` only; tint too strong; hard-cut close |
+| **Review checklist** | Animation Spec Open/Close; a11y dialog; Design Decisions tint/charcoal |
+| **Expected commits** | `feat: fullscreen viewer shell` → `feat: shared-element open close` → `feat: dominant color tint` |
+
+---
+
+## Phase 6 — Navigation + counter
+
+| | |
+|---|---|
+| **Goals** | Keys/wheel/swipe; N±1 preload; slide-fades; animated counter |
+| **Success criteria** | Smooth prev/next; ≤3 decoded full-res; live region announces index |
+| **Deliverables** | `useViewerNav`, `useImagePreload`, `AnimatedCounter` |
+| **Common mistakes** | Preloading ±10; instant counter swap only; ignoring swipe |
+| **Review checklist** | Memory budget; Inventory nav; reduced motion crossfade |
+| **Expected commits** | `feat: viewer navigation and preload` → `feat: animated image counter` |
+
+---
+
+## Phase 7 — Zoom + chrome auto-hide
+
+| | |
+|---|---|
+| **Goals** | Zoom/pan/fit/actual; background modes; chrome idle ~2s |
+| **Success criteria** | Wheel/pinch/dblclick; Fit/`0` Actual/`1`; chrome returns on move |
+| **Deliverables** | `ZoomStage`, `useZoomPan`, `useAutoHideUI`, bg picker |
+| **Common mistakes** | Elastic bounce zoom; chrome never hiding; layout thrash on pan |
+| **Review checklist** | Zoom philosophy; transform-only pan; a11y shortcuts |
+| **Expected commits** | `feat: zoom and pan stage` → `feat: viewer chrome auto-hide` |
+
+---
+
+## Phase 8 — Slideshow
+
+| | |
+|---|---|
+| **Goals** | Exhibition mode; hide cursor/chrome; crossfade; Ken Burns 100–104% |
+| **Success criteria** | Play/pause/loop/shuffle/intervals; reduced motion disables Ken Burns |
+| **Deliverables** | `useSlideshow`, `SlideshowControls`, progress affordance |
+| **Common mistakes** | Cube/flip transitions; sounds; leaving chrome visible the whole time |
+| **Review checklist** | Animation Spec Slideshow; silent audio principle |
+| **Expected commits** | `feat: exhibition slideshow` → `feat: optional ken burns` |
+
+---
+
+## Phase 9 — Download + metadata + persistence
+
+| | |
+|---|---|
+| **Goals** | Original download; EXIF sidebar; last viewed / settings persistence |
+| **Success criteria** | No recompress; sidebar hidden without meta; storage namespaced |
+| **Deliverables** | download util, `useExif`, `MetaSidebar`, storage helpers |
+| **Common mistakes** | Parsing EXIF for every wall image; canvas recompress download |
+| **Review checklist** | Lazy EXIF; Offline; Glossary Metadata |
+| **Expected commits** | `feat: download original` → `feat: exif metadata sidebar` → `feat: view persistence` |
+
+---
+
+## Phase 10 — Polish
+
+| | |
+|---|---|
+| **Goals** | Breathing, ambient parallax, a11y pass, responsive hardening |
+| **Success criteria** | Breathing nearly imperceptible; parallax ≤8px; Quality Checklist green |
+| **Deliverables** | `useBreathing`, `useAmbientParallax`, a11y fixes, responsive tweaks |
+| **Common mistakes** | Obvious looping float; shipping without reduced-motion off switches |
+| **Review checklist** | Full [QUALITY_CHECKLIST.md](./QUALITY_CHECKLIST.md); Testing Strategy manual QA |
+| **Expected commits** | `feat: ambient parallax and breathing` → `fix: a11y and responsive polish` |
+
+---
+
+## Cross-phase rules
+
+- Do not implement later-phase features early “because they’re easy” if they couple poorly  
+- Update docs in the same PR as behaviour  
+- Prefer the commit shapes above; squash only when history is noisy — not to hide unfinished work from review  
