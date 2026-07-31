@@ -17,11 +17,11 @@ Prefer CSS variables / TS theme objects. Do not scatter raw hex or px in compone
 
 ```css
 :root {
-  /* color + type + space defined in sections below */
+  /* Defined in src/styles/tokens.css — mirrored into Tailwind @theme in globals.css */
 }
 ```
 
-Motion durations live in [MOTION_SYSTEM.md](./MOTION_SYSTEM.md) — reference them; do not duplicate conflicting values here.
+Motion durations live in [MOTION_SYSTEM.md](./MOTION_SYSTEM.md) and `src/lib/motion.ts` — reference them; do not duplicate conflicting values in components.
 
 ---
 
