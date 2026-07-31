@@ -4,12 +4,19 @@ A premium, offline-first photography viewing application.
 
 > The interface should disappear. The photographs should remain in memory.
 
-## Design docs
+## Documentation system
 
-- [Experience Design](docs/EXPERIENCE_DESIGN.md) — emotional journey & interaction philosophy
-- [Visual Language](docs/VISUAL_LANGUAGE.md) — typography, color, spacing, motion tokens
-- [Architecture](docs/ARCHITECTURE.md) — IA, components, state, performance, implementation phases
+| Document | Responsibility |
+|---|---|
+| [Experience Design](docs/EXPERIENCE_DESIGN.md) | Emotional journey & interaction feel |
+| [Visual Language](docs/VISUAL_LANGUAGE.md) | Design system (type, color, space, elevation) |
+| [Motion System](docs/MOTION_SYSTEM.md) | Motion tokens, easing, rules, reduced motion |
+| [Animation Spec](docs/ANIMATION_SPEC.md) | Exact per-interaction animation specs |
+| [Interaction Inventory](docs/INTERACTION_INVENTORY.md) | Master interaction catalogue |
+| [Component Guidelines](docs/COMPONENT_GUIDELINES.md) | Component responsibilities & boundaries |
+| [Design Decisions](docs/DESIGN_DECISIONS.md) | Why we chose what we chose |
+| [Architecture](docs/ARCHITECTURE.md) | How the application is built |
 
 ## Status
 
-Experience vision and design system documented. Application implementation follows the architecture phases.
+Production-grade product documentation is in place. Application implementation follows [Architecture — Implementation phases](docs/ARCHITECTURE.md#implementation-phases).

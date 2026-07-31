@@ -1,413 +1,255 @@
-# Gallery Experience — Architecture Plan
+# Architecture
 
-Greenfield build. Stack: **Vite + React + TypeScript + TailwindCSS + Framer Motion + GSAP + Lenis + React Icons**. State via React Context + hooks + `localStorage`. Image discovery via a Vite plugin that scans `public/gallery/` and emits a manifest.
+> **How** Gallery Experience is built.  
+> Experience & why → [EXPERIENCE_DESIGN.md](./EXPERIENCE_DESIGN.md) · [DESIGN_DECISIONS.md](./DESIGN_DECISIONS.md)  
+> Visual → [VISUAL_LANGUAGE.md](./VISUAL_LANGUAGE.md)  
+> Motion → [MOTION_SYSTEM.md](./MOTION_SYSTEM.md) · [ANIMATION_SPEC.md](./ANIMATION_SPEC.md)  
+> Components → [COMPONENT_GUIDELINES.md](./COMPONENT_GUIDELINES.md)  
+> Interactions → [INTERACTION_INVENTORY.md](./INTERACTION_INVENTORY.md)
 
-**Core principle:** The interface should disappear. The photographs should remain in memory.
-
-This is a **premium photography application** (Apple Photos, Lightroom, Arc, Linear, Raycast, editorial books) — not a portfolio site, agency landing, dashboard, file explorer, CMS, or marketing page.
-
-Experience sources of truth:
-
-- [`docs/EXPERIENCE_DESIGN.md`](docs/EXPERIENCE_DESIGN.md) — emotional journey & interaction philosophy
-- [`docs/VISUAL_LANGUAGE.md`](docs/VISUAL_LANGUAGE.md) — typography, color, spacing, motion tokens
+**Stack:** Vite · React · TypeScript · TailwindCSS · Framer Motion · GSAP · Lenis · React Icons  
+**Data:** Offline files in `public/gallery/` + generated manifest · no backend · Context + `localStorage`
 
 ---
 
-## Design Philosophy
+## Documentation map
 
-| Principle | Meaning |
+| Document | Responsibility |
 |---|---|
-| **Calm** | Quiet surfaces; no visual noise; generous whitespace |
-| **Cinematic** | Dark-room viewing; spatial continuity; restrained motion |
-| **Minimal** | Less UI; chrome only when needed |
-| **Premium** | Craft in typography, spacing, easing — never decoration |
-| **Photography-first** | Photographs are the product; interface disappears |
-| **Invisible Interface** | Toolbar deferred; viewer chrome auto-hides |
-| **Spatial Continuity** | Open/close preserves where the image lived on the wall |
-| **Motion with Purpose** | Animation explains origin, destination, or emotion |
-| **Immediately Interactive** | Wave reveal never blocks clicks on visible images |
-| **Owned Environment** | Viewer background tinted ~3–5% from image dominant color |
+| **ARCHITECTURE** (this file) | System structure, data flow, performance, a11y engineering, phases |
+| EXPERIENCE_DESIGN | Emotional journey & interaction feel |
+| VISUAL_LANGUAGE | Design system tokens |
+| MOTION_SYSTEM | Motion tokens, easing, rules |
+| ANIMATION_SPEC | Per-interaction animation sequences |
+| INTERACTION_INVENTORY | Master interaction catalogue |
+| COMPONENT_GUIDELINES | Component behaviour boundaries |
+| DESIGN_DECISIONS | Product decision log |
 
-**References:** Apple Photos, Adobe Lightroom, Arc Browser, Linear, Raycast, Notion Calendar, premium editorial photography books, Scandinavian editorial design.
-
-**Anti-patterns:** agency portfolios, gaming sites, heavy WebGL showcases, dashboard/CMS/file-manager UI, bounce/elastic showmanship, particles, cubes, page flips.
+Avoid duplicating experience/motion prose here — link instead.
 
 ---
 
-## 1. Information Architecture
+## System overview
 
 ```mermaid
 flowchart TD
-  Entry[App Entry] --> Home[Home: Title + Collection Meta + Wall]
-  Home --> Reveal[Immediate Wave Assemble]
-  Reveal --> Wall[Justified Image Wall]
-  Wall --> Interactive[Interactive During Reveal]
-  Wall --> Ambient[Parallax + Breathing]
-  Wall --> Toolbar[Deferred Toolbar]
-  Wall --> Viewer[Dark Room Viewer + Color Tint]
-  Viewer --> Nav[Prev Counter Next]
-  Viewer --> Zoom[Zoom Pan Fit Actual]
-  Viewer --> Slide[Exhibition Slideshow]
-  Viewer --> Meta[EXIF Sidebar]
-  Viewer --> DL[Download]
-  Viewer -->|Esc reverse expand| Wall
-  Wall --> Persist[localStorage]
+  Files[public/gallery images] --> Plugin[Vite manifest plugin]
+  Plugin --> Manifest[gallery-manifest.json]
+  Manifest --> GalleryCtx[GalleryProvider]
+  GalleryCtx --> Home[HomePage wall]
+  GalleryCtx --> Viewer[FullscreenViewer]
+  Home --> Viewer
+  Viewer --> Storage[localStorage persistence]
+  GalleryCtx --> Storage
 ```
 
-**Surfaces**
-
-- **Home (gallery)** — Title + editorial collection meta above an immediately assembling justified wall. No Explore gate.
-- **Deferred toolbar** — Search / sort / favorites; fades in after scroll, interaction, shortcut, or top hover.
-- **Dark Room Viewer** — Shared-element expand; dominant-color tint; auto-hiding chrome.
-- **Info Sidebar** — Optional EXIF / file metadata; hidden when empty.
-- **Slideshow** — Exhibition mode: cursor + chrome fade; photographs only.
-
-**User flows**
-
-1. Land → **Gallery Experience** + collection personality + wall placeholders → wave reveal starts immediately  
-2. User may click any already-revealed image **during** the wave — interaction never waits  
-3. Browse with ambient parallax + nearly invisible breathing; toolbar appears when needed  
-4. Hover elevates photo in the depth stack (scale ~1.02)  
-5. Open → wall darkens/desaturates; selected stays full color; expands into tinted dark room  
-6. Navigate with animated counter; N±1 preload; subtle slide-fades  
-7. Slideshow → cursor/chrome gone; Ken Burns 100→104%; controls on movement  
-8. Escape → reverse expand to cell; restore scroll  
-
-**Data model (offline)** — unchanged
-
-- Source of truth: files in [`public/gallery/`](public/gallery/)
-- Build/dev-time manifest: `public/gallery-manifest.json` (generated)
-- Optional collection meta: title, location, date range, photographer (config/manifest field)
-- Client enrichments: dimensions, orientation, EXIF via `exifr`, dominant color for viewer tint
-- Persistence: favorites, sort, slideshow, last viewed, viewer background, scroll position
+Offline-first: drop images into `public/gallery/` → plugin regenerates manifest on dev/build → UI consumes JSON only.
 
 ---
 
-## 2. Component Tree
+## Folder structure
 
+```text
+gallery-experience/
+├── public/gallery/                 # Drop images here
+├── public/gallery-manifest.json    # Generated
+├── docs/                           # Product documentation system
+├── scripts/generate-gallery-manifest.ts
+└── src/
+    ├── components/{brand,cursor,gallery,ui,viewer}/
+    ├── hooks/
+    ├── context/
+    ├── lib/
+    ├── types/
+    ├── styles/
+    └── vite-plugins/galleryManifest.ts
 ```
+
+Component behaviour: [COMPONENT_GUIDELINES.md](./COMPONENT_GUIDELINES.md).
+
+---
+
+## Component tree (structural)
+
+```text
 App
-├── CursorProvider (desktop; quiet — not gaming)
-├── GalleryProvider (manifest, filter, sort, favorites, collectionMeta)
-├── LenisRoot (smooth scroll)
+├── CursorProvider
+├── GalleryProvider
+├── LenisRoot
 ├── HomePage
 │   ├── CollectionHeader
-│   │   ├── BrandTitle ("Gallery Experience")
-│   │   └── CollectionMeta (title · count · dates · photographer)
-│   ├── GalleryToolbar (deferred fade-in)
-│   └── JustifiedGallery
-│       ├── ReservedPlaceholders (geometry locked)
-│       ├── WaveRevealController (priority organic stagger)
-│       ├── AmbientParallaxLayer (pointer 3–8px)
-│       ├── BreathingLayer (~1px / 8–12s)
-│       ├── VirtualizedRows
-│       └── ImageCard (interactive as soon as visible)
+│   ├── GalleryToolbar          # deferred visibility
+│   └── JustifiedGallery        # virtualized rows + wave
 └── ViewerPortal
-    └── FullscreenViewer (dark room + dominant tint)
-        ├── ExpandingImage (shared-element / FLIP)
-        ├── WallDesaturateOverlay (opening sequence)
-        ├── VignetteGrain (optional, very low opacity)
-        ├── ViewerChrome (auto-hide ~2s)
-        │   ├── TopRight: Download | Info | Close
-        │   └── BottomCenter: Prev | AnimatedCounter | Next
+    └── FullscreenViewer
+        ├── ExpandingImage
         ├── ZoomStage
+        ├── ViewerChrome
         ├── MetaSidebar
-        └── SlideshowController (hide cursor/chrome)
+        └── SlideshowController
 ```
 
-Folder structure unchanged; experience pieces live under existing `brand/`, `gallery/`, `viewer/`, and `hooks/`.
+Experience behaviours (reveal, tint, deferred toolbar, etc.) are specified in Experience / Animation docs — not restated here.
 
 ---
 
-## 3. Folder Structure
+## State management
 
-Unchanged engineering layout:
-
-```
-gallery-experience/
-├── public/
-│   ├── gallery/
-│   │   └── .gitkeep
-│   └── gallery-manifest.json
-├── docs/
-│   ├── EXPERIENCE_DESIGN.md      # Emotional / interaction source of truth
-│   └── VISUAL_LANGUAGE.md        # Visual design system
-├── scripts/
-│   └── generate-gallery-manifest.ts
-├── src/
-│   ├── main.tsx
-│   ├── App.tsx
-│   ├── components/
-│   │   ├── brand/BrandHero.tsx   # CollectionHeader
-│   │   ├── cursor/MagneticButton.tsx, CustomCursor.tsx
-│   │   ├── gallery/JustifiedGallery.tsx, ImageCard.tsx, GalleryToolbar.tsx
-│   │   ├── ui/IconButton.tsx, Skeleton.tsx, FocusRing.tsx, AnimatedCounter.tsx
-│   │   └── viewer/
-│   │       FullscreenViewer.tsx, ExpandingImage.tsx, ZoomStage.tsx,
-│   │       ViewerChrome.tsx, MetaSidebar.tsx, SlideshowControls.tsx,
-│   │       BackgroundLayer.tsx
-│   ├── hooks/
-│   │   useGallery.ts, useJustifiedLayout.ts, useViewerNav.ts,
-│   │   useImagePreload.ts, useSlideshow.ts, useZoomPan.ts,
-│   │   useAutoHideUI.ts, useFavorites.ts, useLocalStorage.ts,
-│   │   useExif.ts, useMediaQuery.ts, useKeyboard.ts,
-│   │   useWaveReveal.ts, useAmbientParallax.ts, useBreathing.ts,
-│   │   useDominantColor.ts, useDeferredToolbar.ts
-│   ├── context/GalleryContext.tsx, ViewerContext.tsx, CursorContext.tsx
-│   ├── lib/
-│   │   justified.ts, sort.ts, orientation.ts, preload.ts,
-│   │   download.ts, format.ts, storage.ts, waveOrder.ts, colorSample.ts
-│   ├── types/gallery.ts, viewer.ts, exif.ts
-│   ├── styles/globals.css, tokens.css
-│   └── vite-plugins/galleryManifest.ts
-├── index.html
-├── package.json
-├── vite.config.ts
-├── tailwind.config.ts
-└── tsconfig.json
-```
-
----
-
-## 4. Experience & Motion Strategy
-
-### Home (gallery-first — no landing gate)
-
-```text
-Gallery Experience
-Landscapes of India
-248 Photographs · Captured 2021–2026
-[ justified wall assembles immediately ]
-```
-
-No Explore button. No Space-to-start. Users immediately understand they are here to explore photographs.
-
-### Immediately interactive
-
-1. Calculate geometry  
-2. Render reserved placeholders  
-3. **User can already interact**  
-4. Wave reveal continues independently  
-
-Images that have appeared are clickable at once. **Interaction must never wait for animation.**
-
-### Gallery reveal (reserved layout)
-
-Placeholders locked first — zero CLS. Cells: fade + translate 20–40px + scale from 0.97 + ≤5° rotation → spring to rest. Full assemble ~1.5s. Feeling: assembled, not animated.
-
-### Progressive wave (signature)
-
-Organic priority — not L→R, T→B, or pure random:
-
-- Larger photographs slightly earlier  
-- Hero / dominant images first  
-- Smaller images fill remaining gaps  
-
-Stagger 15–25ms. GSAP timeline over reserved grid.
-
-### Ambient life (post-settle)
-
-- **Parallax:** pointer → 3–8px floating-paper shift; stops on pointer leave  
-- **Breathing:** every 8–12s, ~1px + tiny brightness shift — almost invisible visual life, not floating decoration  
-
-### Deferred toolbar
-
-Initial chrome: title + collection meta only. Search / sort / favorites fade in after scroll, interaction, search shortcut, or top-area hover.
-
-### Hover & depth
-
-```text
-Background → Gallery Plane → Hovered Photograph → Fullscreen Viewer
-```
-
-Hover: scale ~1.02, slight brightness, soft shadow, optional filename. No overlays or floating buttons.
-
-### Opening sequence (hero)
-
-1. Background gently darkens  
-2. Gallery slightly desaturates  
-3. Selected image keeps full color  
-4. Shared-element expand into viewer  
-5. Dominant-color tint (~3–5%) applied to charcoal base  
-
-Not a popup — another viewing mode.
-
-### Viewer (dark room)
-
-Charcoal + sampled tint (snow→cool, forest→muted green, ocean→navy, sunset→warm graphite). Optional vignette/grain at very low opacity.
-
-**Chrome:** bottom center Prev · **AnimatedCounter** · Next; top right Download · Info · Close. Auto-hide ~2s.
-
-**Counter:** digits animate individually (`020`→`021`).
-
-### Manual nav transitions
-
-Current slides ~8% while fading; incoming from opposite direction — Netflix-subtle.
-
-### Slideshow (digital exhibition)
-
-On play: cursor fades, chrome fades, only photographs remain, Ken Burns 100→104%. Controls return immediately on movement. Crossfade only — no cubes/flips.
-
-### Closing
-
-Reverse expand to original cell; restore scroll; never hard-cut.
-
----
-
-## Motion Rules
-
-| Rule | Limit |
-|---|---|
-| Maximum rotation | **5°** |
-| Maximum hover scale | **1.02** |
-| Maximum reveal movement | **40px** |
-| Maximum single reveal duration | **900ms** |
-| Maximum stagger | **25ms** |
-| Full gallery assemble | **~1.5s** |
-| Ambient parallax | **3–8px** |
-| Breathing | **~1px / 8–12s** |
-| Ken Burns scale | **100% → 104%** |
-| Nav slide offset | **~8%** |
-| Chrome auto-hide | **~2s** |
-| Dominant tint | **3–5%** |
-
-**Forbidden:** bounce, elastic showmanship, flashy easing, particles, explosions, large camera swings, infinite decorative animations, layout-shifting reveals, blocking interaction for motion.
-
-Numeric tokens: [`docs/VISUAL_LANGUAGE.md`](docs/VISUAL_LANGUAGE.md).
-
-Honor `prefers-reduced-motion`: skip wave rotation, parallax, breathing, Ken Burns; short opacity only.
-
----
-
-## Technology Responsibilities
-
-| Tool | Responsibility |
-|---|---|
-| **Framer Motion** | Shared-element open/close, UI chrome, counter digits, toolbar fade |
-| **GSAP** | Wave reveal timeline, ambient parallax, breathing, cinematic loading beats |
-| **Lenis** | Smooth scrolling; restore continuity on close |
-| **React Virtual** | Large gallery row windowing |
-| **Three.js** | **Not in V1** — DOM-based app |
-
----
-
-## 5. State Management Plan
-
-**Unchanged pattern.** No Redux / Zustand. Three focused contexts + local state.
+No Redux/Zustand. Three contexts + hooks.
 
 ```mermaid
 flowchart LR
-  Manifest[gallery-manifest.json] --> GalleryCtx
-  GalleryCtx --> FilterSort[query sort favoritesFilter]
-  GalleryCtx --> Items[GalleryItem array]
-  GalleryCtx --> CollMeta[collectionMeta]
-  FavoritesLS[localStorage favorites] --> GalleryCtx
-  SettingsLS[localStorage settings] --> ViewerCtx
+  Manifest --> GalleryCtx
+  GalleryCtx --> Items
+  GalleryCtx --> FilterSort
+  GalleryCtx --> CollMeta
+  FavoritesLS --> GalleryCtx
+  SettingsLS --> ViewerCtx
   GalleryCtx --> ViewerCtx
-  ViewerCtx --> Index[currentIndex]
-  ViewerCtx --> Zoom[zoom pan fitMode]
-  ViewerCtx --> Slide[playing interval loop shuffle kenBurns]
-  ViewerCtx --> UI[chromeVisible bgMode sidebarOpen tintColor]
-  ToolbarUI[deferredToolbarVisible] --> HomePage
+  ViewerCtx --> Index
+  ViewerCtx --> Zoom
+  ViewerCtx --> Slide
+  ViewerCtx --> UI
 ```
 
-**`GalleryItem`** — unchanged shape; dominant color may be cached per id at runtime.
+**`GalleryItem`:** `id`, `src`, `filename`, `width`, `height`, `orientation`, `mtime?`, `bytes?`  
+**Collection meta (optional):** title, location, dateRange, photographer  
+**Persistence keys:** `ge:favorites`, `ge:sort`, `ge:slideshow`, `ge:lastViewed`, `ge:viewerBg`, `ge:scrollY`
 
-**Collection meta (optional):** `{ title?, location?, dateRange?, photographer? }` from manifest or small config beside it.
-
-**Persistence keys:** `ge:favorites`, `ge:sort`, `ge:slideshow`, `ge:lastViewed`, `ge:viewerBg`, `ge:scrollY`.
-
-No explore-gate flag — gallery is always the home experience.
+Derived filtered/sorted lists via `useMemo`. Viewer index maps into the derived list.
 
 ---
 
-## 6. Performance Strategy
+## Data flow
 
-**Unchanged architecture.** Critical for 100–1000+ images.
-
-- **Discovery** — Vite plugin scans `public/gallery`; manifest with path, w/h, mtime, bytes  
-- **Layout** — Justified rows precomputed before reveal; zero CLS  
-- **Virtualization** — Row windowing via `@tanstack/react-virtual`  
-- **Image loading** — lazy + async decode; skeleton → blur-up; interactive when painted  
-- **Viewer memory** — Preload only N±1  
-- **Color sample** — Sample on open (or once cache miss); cheap downscale canvas; do not block open  
-- **EXIF** — Lazy when sidebar opens  
-- **Motion** — Compositor props; reduced-motion path  
-
-**Deps:** `framer-motion`, `gsap`, `lenis`, `react-icons`, `@tanstack/react-virtual`, `exifr`, `image-size` (dev/plugin). No Three.js in V1.
+1. Plugin scans `public/gallery` → writes manifest (path, dimensions via `image-size`, mtime, bytes)  
+2. App loads manifest → `GalleryProvider`  
+3. Justified layout precomputes rows for viewport width  
+4. Virtualizer mounts visible rows; images lazy-load  
+5. Open viewer → shared-element; preload N±1; optional EXIF on sidebar; dominant color sample for tint  
+6. Mutations (favorites, settings) write through storage helpers  
 
 ---
 
-## 7. Accessibility Plan
+## Technology responsibilities
 
-- `<main>` home; gallery as list of buttons opening dialog  
-- Viewer `role="dialog"` + `aria-modal` + focus trap  
-- Keyboard: `←/→`, `Esc` (reverse close), `Space` slideshow play-pause, zoom keys, `F` favorite, `I` info, `/` or Cmd/Ctrl+K style search focus when toolbar deferred  
-- Visible focus rings; `aria-label` on icon controls  
-- Live region for counter (“Image 21 of 248”) — independent of digit animation  
+| Tool | Responsibility |
+|---|---|
+| Framer Motion | Shared-element open/close, UI chrome, counter digits, toolbar fade |
+| GSAP | Wave reveal, ambient parallax, breathing, cinematic loading beats |
+| Lenis | Smooth scrolling; restore continuity |
+| React Virtual | Row windowing |
+| exifr | Lazy EXIF when sidebar opens |
+| Three.js | **Not in V1** |
+
+Motion token ownership: [MOTION_SYSTEM.md](./MOTION_SYSTEM.md).
+
+---
+
+## Image loading strategy
+
+```text
+Thumbnail / display-sized decode  →  Medium (wall)  →  Fullscreen stage  →  Original (download only)
+```
+
+| Concern | Approach |
+|---|---|
+| **Decoding** | `decoding="async"`; decode near viewport; viewer decodes current (+N±1) |
+| **Caching** | Browser HTTP cache for static `/gallery/*`; optional in-memory dominant-color cache per id |
+| **Preloading** | Viewer: **only N−1 and N+1**. Never entire album |
+| **Memory** | Unmount offscreen wall imgs via virtualization; tear down stage on close; cap zoom bitmap pressure |
+| **Transitions** | Do not swap sources mid-FLIP; promote to fullscreen src after expand when needed |
+| **Progressive** | Skeleton → blur-up → full (Experience Level 4) |
+| **Future responsive** | Optional build step for `srcset` widths; V1 may serve originals constrained by CSS/`sizes` |
+
+Download always uses **original** bytes — no re-encode.
+
+---
+
+## Performance strategy
+
+- Manifest dimensions reserve aspect boxes → minimize CLS  
+- Justified geometry before paint/reveal  
+- Row virtualization + overscan ~2  
+- Compositor-friendly animation (`transform`/`opacity`)  
+- Dominant color: downscale sample; must not block open  
+
+### Performance budgets (targets)
+
+| Metric | Budget |
+|---|---|
+| Initial JS (gzip, app critical) | ≤ **180KB** aim (watch animation libs) |
+| LCP (sample collection, warm cache) | ≤ **2.5s** on mid desktop |
+| CLS | **&lt; 0.1** (prefer ~0 via reserved boxes) |
+| Gallery scroll | **≥ 50 FPS** steady on laptop while virtualizing |
+| Animation | **≥ 50 FPS** during reveal/open on target hardware |
+| Interaction latency (click→feedback) | **&lt; 100ms** |
+| Max simultaneous decoded full-res in viewer | **≤ 3** (prev, current, next) |
+| Wall decoded (approx) | Visible row imgs + small overscan only |
+| Memory | Avoid unbounded image bitmap growth; no full-album decode |
+
+Budgets are engineering targets — measure in CI/Lighthouse where practical.
+
+---
+
+## Progressive enhancement
+
+| Level | Features | If unavailable |
+|---|---|---|
+| **0** | Manifest, wall, open/close, nav, download | — core |
+| **1** | Motion (reveal, shared element, chrome) | Instant state changes |
+| **2** | Ambient parallax | Static wall |
+| **3** | Dominant-color tint | Flat charcoal |
+| **4** | Blur-up / progressive polish | Skeleton → sharp |
+| **5** | Future enhancements | Ignored |
+
+`prefers-reduced-motion` forces motion toward Level 0–1 behaviour per [MOTION_SYSTEM.md](./MOTION_SYSTEM.md#reduced-motion).
+
+---
+
+## Accessibility
+
+- Semantic home + gallery activators; viewer `role="dialog"` `aria-modal` + focus trap  
+- Keyboard: arrows, Esc (reverse close), Space slideshow, zoom keys, `F` favorite, `I` info, search shortcut  
+- Visible focus rings; labelled icon controls; live regions for index/results  
 - Touch targets ≥ 44px  
-- `prefers-reduced-motion` respected  
-- Contrast AA on charcoal / tinted / white viewer modes  
+- Contrast AA for chrome on charcoal/tint/white modes  
+- Details of feel: Experience; reduced motion: Motion System  
 
 ---
 
-## 8. Responsive Strategy
+## Responsive behaviour
 
-- **Mobile** — Title + meta compact; dual/single justified; deferred toolbar as icon sheet; swipe viewer; parallax/breathing reduced or off  
-- **Tablet** — Moderate density; sidebar drawer  
-- **Desktop** — Full motion language; quiet cursor  
-- **Ultra-wide** — Cap or denser full-bleed; letterboxed dark room  
-
----
-
-## Visual Direction (locked)
-
-- Dark charcoal room (`#0e0e0e`–`#141414`) + per-image tint  
-- Display: Instrument Serif · UI: Outfit  
-- Accent: warm platinum for focus only  
-- Home: title + editorial meta **above** immediately assembling wall  
-- Invisible UI: deferred toolbar; auto-hiding viewer chrome  
-
-Details: [`docs/VISUAL_LANGUAGE.md`](docs/VISUAL_LANGUAGE.md).
+| Surface | Behaviour |
+|---|---|
+| Mobile | Compact header; 1–2 col density; swipe viewer; reduced ambient; deferred toolbar as icon sheet |
+| Tablet | Moderate density; sidebar drawer |
+| Desktop | Full motion/cursor language |
+| Ultra-wide | Cap or denser full-bleed; letterboxed viewer |
 
 ---
 
-## Core vs optional polish
+## Future product roadmap
 
-**Core (ship with experience)**
+Conceptual modules — **do not design here**; keep architecture extensible (context boundaries, manifest schema versioning):
 
-- Immediate interactive wave reveal (priority algorithm)  
-- Deferred toolbar  
-- Collection personality fields  
-- Opening desaturate + shared-element expand  
-- Dominant-color viewer tint (3–5%)  
-- Animated image counter  
-- Breathing + ambient parallax  
-- Exhibition slideshow (hide cursor/chrome)  
-
-**Optional later**
-
-- “Preparing Collection” narrative loading  
-- Heavier multi-resolution pyramids  
-- Scroll/last-viewed niceties beyond baseline persistence  
+Collections · Albums · Timeline · Map View · AI / colour / face search · Cloud sync · Printing · Presentation mode · Editing
 
 ---
 
-## Implementation Sequence (after approval)
+## Implementation phases
 
-Phases unchanged; experience refinements fold into the same milestones:
+Unchanged sequence — experience details live in other docs:
 
-1. Scaffold Vite/React/TS/Tailwind + Framer Motion + GSAP + Lenis + design tokens + fonts  
-2. Gallery manifest Vite plugin + sample images + types (+ optional collection meta)  
-3. Justified layout + reserved placeholders + virtualized wall + priority wave reveal + ImageCard  
-4. Deferred gallery toolbar (search, sort, favorites)  
-5. Dark-room viewer + shared-element open/close + wall desaturate + dominant tint  
+1. Scaffold + tokens/fonts + Lenis/Framer/GSAP  
+2. Manifest plugin + types + sample images + collection meta fields  
+3. Justified layout + placeholders + virtualization + wave reveal + ImageCard  
+4. Deferred toolbar (search, sort, favorites)  
+5. Dark-room viewer + shared-element + wall desaturate + dominant tint  
 6. Nav + N±1 preload + slide-fades + animated counter  
-7. Zoom/pan/fit/actual + background modes + auto-hide chrome (~2s)  
-8. Exhibition slideshow + Ken Burns 100→104%  
-9. Download + Meta sidebar (EXIF) + persistence  
+7. Zoom/pan/fit/actual + background modes + auto-hide chrome  
+8. Exhibition slideshow + Ken Burns  
+9. Download + EXIF sidebar + persistence  
 10. Breathing + ambient parallax + a11y + responsive hardening  
 
-Each commit stays reviewable and runnable.
-
-**Out of scope for V1:** sound toggle, CMS, upload UI, server-side resizing, accounts, Three.js / WebGL heroes, Explore/landing gates.
+**Out of scope V1:** sound, CMS, upload UI, server resizing, accounts, Three.js, landing gates.

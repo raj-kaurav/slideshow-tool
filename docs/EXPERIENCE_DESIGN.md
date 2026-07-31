@@ -1,82 +1,69 @@
 # Experience Design
 
-> **The interface should disappear. The photographs should remain in memory.**
+> Emotional and interaction source of truth — **not** engineering.  
+> Visual system: [VISUAL_LANGUAGE.md](./VISUAL_LANGUAGE.md)  
+> Motion language: [MOTION_SYSTEM.md](./MOTION_SYSTEM.md)  
+> Why we chose this: [DESIGN_DECISIONS.md](./DESIGN_DECISIONS.md)  
+> How it is built: [ARCHITECTURE.md](./ARCHITECTURE.md)
 
-This document defines the emotional and interaction experience for Gallery Experience. It is not engineering documentation. Every future interaction should be measured against the principle above.
-
-Companion document: [VISUAL_LANGUAGE.md](./VISUAL_LANGUAGE.md)
+**The interface should disappear. The photographs should remain in memory.**
 
 ---
 
 ## Design philosophy
 
-Gallery Experience is a **photography application** — closer to Apple Photos, Lightroom, Arc, Linear, and Raycast than to a portfolio site or agency showcase.
+Gallery Experience is a **photography application** — closer to Apple Photos, Lightroom, Arc, Linear, and Raycast than to a portfolio or agency site.
 
 | We are | We are not |
 |---|---|
 | A calm place to view photographs | A creative agency website |
-| A dark-room for images | A portfolio landing page |
+| A dark room for images | A portfolio landing page |
 | An invisible interface | A dashboard or CMS |
 | Editorial and timeless | A file explorer |
-| Motion in service of orientation | A marketing website or WebGL demo |
+| Motion in service of orientation | A marketing or WebGL demo |
 
-### Principles
+Principles: calm, cinematic, minimal, premium, photography-first, invisible interface, spatial continuity, motion with purpose, immediately interactive, owned environment (subtle color tint).
 
-- **Calm** — Quiet surfaces; no visual noise; generous whitespace
-- **Cinematic** — Dark-room viewing; spatial continuity; restrained motion
-- **Minimal** — Less UI; chrome only when needed
-- **Premium** — Craft in typography, spacing, easing — never decoration
-- **Photography-first** — Photographs are the product
-- **Invisible Interface** — Controls appear only when useful
-- **Spatial Continuity** — Open/close preserves where the image lived
-- **Motion with Purpose** — Animation explains origin, destination, or emotion — never spectacle
-- **Immediately Interactive** — Animation never blocks interaction
+### References
 
----
+**Embrace:** Apple Photos, Adobe Lightroom, Arc Browser, Linear, Raycast, Notion Calendar, premium editorial photography books, Scandinavian editorial design.
 
-## Design references
-
-**Embrace**
-
-- Apple Photos
-- Adobe Lightroom
-- Arc Browser
-- Linear
-- Raycast
-- Notion Calendar
-- Premium editorial photography books
-- Scandinavian editorial design
-
-**Avoid**
-
-- Creative agency portfolios
-- Gaming websites
-- Heavy WebGL showcases
-- Dashboard / CMS / file-manager patterns
-- Trendy effects that date quickly
-
-The product should feel **timeless rather than trendy**.
+**Avoid:** Creative agency portfolios, gaming sites, heavy WebGL showcases, dashboard/CMS patterns, trendy effects that date quickly.
 
 ---
 
 ## Emotional journey
 
-```text
-Arrive          →  “I’m here to explore photographs.”
-Wall assembles  →  Quiet wonder; collection reveals itself
-Browse          →  Calm focus; interface stays out of the way
-Hover           →  Gentle elevation; photograph asks for attention
-Enter viewer    →  Enter a dark room owned by this image
-Navigate        →  Orientation without distraction
-Slideshow       →  Digital exhibition; only light and photographs
-Return          →  Back to the wall, exactly where you left
-```
+| Stage | Feeling | What the product does |
+|---|---|---|
+| **Arrival** | “I’m here to explore photographs.” | Open onto title + wall — no marketing gate |
+| **Curiosity** | Soft wonder as the collection appears | Wave assemble; reserved, calm |
+| **Discovery** | Browsing without friction | Scroll, hover elevation, deferred chrome |
+| **Immersion** | Entering a room owned by one image | Shared-element open; tinted dark room |
+| **Focus** | Looking, not managing | Hidden chrome; precise zoom; quiet nav |
+| **Reflection** | Optional context | Metadata only when asked; editorial empty states |
+| **Completion** | Leaving with images, not UI | Reverse close; position remembered |
 
-Users should leave remembering **images**, not chrome or motion.
+Users should leave remembering **photographs**, not controls or motion.
 
 ---
 
-## Home experience (no landing gate)
+## Interaction philosophy
+
+How interactions should *feel* (never how they are coded):
+
+- **Responsive** — The wall never feels locked behind animation  
+- **Quiet** — Feedback is whispered (hover, counters, tints)  
+- **Oriented** — You always know where you came from  
+- **Tactile** — Zoom and pan feel physical, not floaty  
+- **Respectful** — Chrome appears when useful, vanishes when not  
+- **Silent** — No UI sounds compete with looking  
+
+If an interaction makes someone remember the *effect*, simplify it.
+
+---
+
+## Home experience
 
 The gallery **is** the homepage.
 
@@ -87,200 +74,202 @@ Landscapes of India
 
 □□□□□□□□□□□□□□□□□□□□□□
 □□□□□□□□□□□□□□□□□□□□□□
-□□□□□□□□□□□□□□□□□□□□□□
 ```
 
-- Large title and editorial collection metadata sit **above** the wall
-- The gallery begins assembling **immediately**
-- No Explore button, no Space-to-start, no explicit gate
-- The reveal itself is the welcome
-
-Feeling: opening a photography app — not arriving at a marketing page.
+- Product title and editorial collection meta sit above the wall  
+- The gallery begins assembling immediately  
+- No Explore button, no Space-to-start gate  
+- The reveal *is* the welcome  
 
 ### Collection personality
 
-Metadata should feel editorial and optional:
-
-- Collection title (e.g. Landscapes of India)
-- Location
-- Date range (e.g. Captured 2021–2026)
-- Photographer
-
-Keep it subtle. If a field is absent, omit it — never show empty labels.
+Optional editorial fields: collection title, location, date range, photographer. Omit missing fields — never show empty labels.
 
 ---
 
-## Gallery reveal
+## Gallery reveal & browsing behaviour
 
-1. Calculate justified geometry first
-2. Render reserved placeholders (final positions locked — zero layout shift)
-3. Images populate placeholders in a progressive wave
-4. Feeling: **“The gallery assembled itself.”**
+### Reveal
 
-### Wave algorithm (intentional, not random)
-
-Reveal priority:
-
-- Larger photographs slightly earlier
-- Hero / visually dominant images first
-- Smaller images fill remaining gaps naturally
-
-Avoid left-to-right, top-to-bottom, and pure randomness. The spread should feel balanced and organic.
-
-Per image: fade, translate 20–40px, scale from ~0.97, rotation ≤5°, spring into rest. Full assemble ~1.5s. Stagger 15–25ms.
+Geometry first → reserved placeholders → priority organic wave (larger/hero earlier). Feeling: **the gallery assembled itself.**
 
 ### Immediately interactive
 
-**Animation never blocks interaction.**
+Visible images are clickable during the wave. Interaction never waits for animation to finish.
 
-1. Geometry calculated  
-2. Placeholders rendered  
-3. User can already interact  
-4. Wave reveal continues independently  
+### Scrolling
 
-Any image that has appeared is immediately clickable. Interaction must never wait for the timeline to finish.
+Smooth, calm, Lenis-assisted. Scrolling may reveal the deferred toolbar. Position should feel restorable when returning from the viewer.
 
----
+### Hover
 
-## Browsing behaviour
+Slight elevation in the depth stack (background → plane → hovered photo → viewer). Filename optional. No overlays or floating buttons.
 
-After settle:
+### Discovery
 
-- **Ambient parallax** — Pointer shifts the plane ~3–8px; nearer images respond more (floating paper, not chase). Stops when pointer leaves.
-- **Breathing** — Every 8–12s, ~1px movement and a barely perceptible brightness shift. The user should not consciously notice it; it only prevents a frozen feel. Not floating animation — visual life.
-- **Toolbar** — Initial UI is almost empty (title + collection meta only). Toolbar (search, sort, favorites) fades in after scroll, interaction, search shortcut, or hovering the top area.
+Search and sort exist but stay out of the first glance. Favorites are personal and local.
 
-Attention stays on photography.
+### Returning to a previous image
 
----
+Closing the viewer returns to the same cell. Last viewed and scroll memory support re-entry without disorientation.
 
-## Hover behaviour
+### Ambient life
 
-Depth hierarchy:
+After settle: pointer parallax (floating paper, 3–8px) and nearly invisible breathing (~1px / 8–12s). Not decoration — anti-freeze.
 
-```text
-Background
-  → Gallery Plane
-    → Hovered Photograph
-      → Fullscreen Viewer
-```
+### Deferred toolbar
 
-Hovered images elevate slightly above neighbors:
-
-- Scale ≈ 1.02
-- Slight brightness increase
-- Soft shadow (enough to read elevation, never dramatic)
-- Optional filename only
-
-No overlays, floating buttons, or large labels. The photograph remains the focus.
+Initially almost empty chrome. Toolbar fades in after scroll, interaction, search shortcut, or top-area hover.
 
 ---
 
-## Opening transition (hero interaction)
+## Viewer behaviour
 
-Not a modal — a change of viewing mode:
+### Dark room
 
-1. Background gently darkens  
-2. Gallery slightly desaturates  
-3. Selected image retains full color  
-4. Image expands from its exact cell (shared element)  
-5. Dark-room viewer settles in  
+Charcoal base — not pure black. Optional vignette/grain at very low opacity. **Dominant-color tint (~3–5%)** so each photograph owns its environment (snow→cool, forest→muted green, ocean→navy, sunset→warm graphite).
 
-Guides attention without drama. Spatial continuity preserved.
+### Attention
 
----
+Opening: background darkens, wall desaturates, selected stays full color, image expands. Not a popup — a mode change.
 
-## Viewer behaviour (dark room)
+### Navigation
 
-- Dark charcoal base, not absolute black
-- **Dominant-color tint (~3–5%)** sampled from the photograph — core principle, not optional polish  
-  - Snow → cool charcoal  
-  - Forest → muted green  
-  - Ocean → deep navy  
-  - Sunset → warm graphite  
-- Optional vignette / fine grain at very low opacity
-- Each photograph owns its environment
+Minimal chrome: bottom Prev · Counter · Next; top Download · Info · Close. Auto-hide ~2s; return on movement. Digits animate subtly. Manual transitions are Netflix-subtle (±8% slide-fade).
 
-### Chrome
+### Closing & returning
 
-Extremely minimal; auto-hides ~2s; returns on movement:
-
-- **Bottom center:** Previous · Counter · Next  
-- **Top right:** Download · Info · Close  
-
-### Counter
-
-Digits animate individually (`020` → `021`) — subtle premium polish, never a flip-clock spectacle.
-
-### Navigation philosophy
-
-- Keyboard, wheel, swipe, touch — all first-class
-- Manual transitions: current slides ~8% while fading; next arrives from the opposite side (Netflix-subtle)
-- Preload only N±1
-- Zoom/pan feel tactile and precise, like Lightroom
-
-### Closing
-
-Reverse of opening: image returns to its cell; scroll restored; never a hard cut.
+Reverse expand to the original cell; restore scroll; preserve orientation. Never hard-cut.
 
 ---
 
-## Slideshow philosophy
+## Slideshow behaviour
 
-A premium digital exhibition:
+Emotionally: a **premium digital exhibition**.
 
-- Cursor fades away
-- Chrome fades away
-- Only photographs remain
-- Subtle Ken Burns (100% → ~104%) continues
-- Controls return immediately on movement
+- Cursor and chrome fade away  
+- Only photographs remain  
+- Crossfade + optional Ken Burns (100%→~104%)  
+- Movement immediately restores controls  
+- No cubes, flips, or showy wipes  
 
-Crossfade only. No cubes, page flips, or rotating galleries. Photography carries the emotion.
+Photography carries the emotion.
 
 ---
 
-## Motion principles
+## Zoom philosophy
 
-Motion exists for **navigation, orientation, and emotion**.
-
-| Allowed | Forbidden |
+| Input | Behaviour |
 |---|---|
-| Spatial continuity | Bounce / elastic showmanship |
-| Invisible guidance | Particles, explosions |
-| Short, purposeful springs | Large camera swings |
-| Micro slide-fades | Infinite looping decoration |
-| Almost-imperceptible breathing | Layout-shifting reveals |
+| Mouse wheel / trackpad | Zoom toward cursor (viewer) |
+| Pinch | Zoom toward gesture center |
+| Double click / double tap | Toggle fit ↔ magnified |
+| Fit (`0`) | Entire image visible |
+| 100% / actual (`1`) | Native pixels |
+| Reset | Return to default fit |
+| Pan | Drag only when magnified beyond fit |
+| Limits | Min = fit (or slightly under); max = sensible cap (e.g. 4–8×) to protect memory/feel |
+| Animation | Interactive follow; programmatic Fit/100% ease briefly |
 
-If the user notices the motion more than the photograph, it failed.
-
-See [VISUAL_LANGUAGE.md](./VISUAL_LANGUAGE.md) for numeric motion tokens.
-
----
-
-## Accessibility motion rules
-
-When `prefers-reduced-motion: reduce`:
-
-- Skip wave rotation, ambient parallax, breathing, and Ken Burns
-- Use short opacity fades or instant state changes
-- Keep shared-element open/close as a short fade if full FLIP is too much
-- Never rely on motion alone to convey state — counters, labels, and focus still communicate
-
-Keyboard and screen-reader paths remain complete regardless of motion preference.
+Zoom should feel like Lightroom precision — not elastic rubber-banding.
 
 ---
 
-## Future premium enhancements
+## Search philosophy
 
-Optional later — do not block the core experience:
+V1: instant filename filter, debounced, client-only.
 
-- Scroll position memory (beyond V1 baseline)
-- Deeper “Preparing Collection” calm loading narrative
-- Stronger progressive decoding / multi-resolution pyramids
-- Skip-landing preferences (not needed — there is no gate)
-- Sound toggle (explicitly out of V1 unless requested)
-- True 3D hero (Three.js) — only if a future product need requires it; app stays DOM-based
+**Long-term fields (conceptual):** filename, collection, photographer, location, date, keywords, favorites.
 
-Every enhancement must still reinforce:
+Search stays calm: no flashing results panels; wall filters in place; empty results are editorial, not errors.
 
-> The interface should disappear. The photographs should remain in memory.
+---
+
+## Empty states
+
+Each should feel **intentional**, not broken.
+
+| State | Tone |
+|---|---|
+| Empty gallery | “Add photographs to `gallery/` to begin.” Quiet invitation |
+| No search results | “No photographs match.” Offer clear |
+| No favorites | “Star photographs to collect them here.” |
+| No metadata | Sidebar simply does not appear |
+| Offline / unavailable (future) | Calm notice; cached viewing if possible |
+
+Typography-led. No bouncing empty illustrations.
+
+---
+
+## Error states
+
+Graceful degradation — keep the dark room calm.
+
+| Failure | Behaviour |
+|---|---|
+| Broken / missing image | Quiet cell placeholder; optional retry |
+| Decode failure | Same; do not infinite-loop decode |
+| Missing metadata | Hide sidebar / fields |
+| Missing manifest | Clear recovery copy (regenerate / check folder) |
+| Corrupt image | Skip-friendly placeholder; nav still works |
+| Unexpected load failure | Non-alarm inline message |
+| Network failure (future) | Degrade to cache; explain without panic |
+
+Never turn the product into a red error dashboard.
+
+---
+
+## Audio philosophy
+
+The application intentionally includes:
+
+- **No** UI sounds  
+- **No** click sounds  
+- **No** hover sounds  
+- **No** slideshow sounds  
+
+Photography remains silent.
+
+---
+
+## Progressive enhancement (experience levels)
+
+The product stays useful at every level:
+
+| Level | Experience |
+|---|---|
+| **0** | Core gallery + open/close + nav |
+| **1** | Motion (reveal, shared element, chrome) |
+| **2** | Ambient parallax |
+| **3** | Dominant-color tint |
+| **4** | Blur-up / progressive loading polish |
+| **5** | Future enhancements |
+
+Higher levels must not be required for viewing photographs. Reduced motion maps toward lower motion levels.
+
+Engineering mapping: [ARCHITECTURE.md](./ARCHITECTURE.md#progressive-enhancement).
+
+---
+
+## Future experience ideas
+
+Conceptual only — **do not design or build here**:
+
+- Richer collection storytelling between albums  
+- Timeline or map-shaped browsing moods  
+- Presentation / critique mode for clients  
+- Print-oriented review layout  
+- Deeper “remembering” across sessions  
+
+Roadmap modules: [ARCHITECTURE.md](./ARCHITECTURE.md#future-product-roadmap).
+
+---
+
+## Accessibility (experience)
+
+- Keyboard-first paths for every critical action  
+- Focus always visible  
+- Motion never required to understand state  
+- Screen readers get filenames, counts, and control names  
+
+Detailed engineering a11y: [ARCHITECTURE.md](./ARCHITECTURE.md#accessibility).
