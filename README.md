@@ -41,6 +41,7 @@ A premium, offline-first photography viewing application.
 
 - Documentation system complete
 - **Phase 1 (Scaffold)** complete — Vite 8 + React 19 + TypeScript strict + **Tailwind CSS v4** + Framer Motion + GSAP + Lenis; design tokens; `@fontsource` fonts; providers; `pages/HomePage` shell; **oxlint** + Prettier
+- **Phase 2 (Manifest)** complete — Vite plugin scans `public/gallery/`, writes `gallery-manifest.json`; `GalleryProvider` loads it; optional `public/gallery.json` collection meta
 
 ```bash
 npm install
@@ -49,10 +50,11 @@ npm run dev
 
 | Script | Purpose |
 |---|---|
-| `npm run dev` | Vite dev server |
+| `npm run dev` | Vite dev server (regenerates manifest on gallery changes) |
 | `npm run build` | `tsc -b` + production build |
 | `npm run typecheck` | TypeScript project build check |
 | `npm run lint` | oxlint |
 | `npm run format` | Prettier write |
+| `npm run gallery:manifest` | Regenerate manifest without starting Vite |
 
 Further phases: [Implementation Playbook](docs/IMPLEMENTATION_PLAYBOOK.md)

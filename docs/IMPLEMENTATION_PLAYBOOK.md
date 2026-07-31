@@ -25,12 +25,13 @@ Each phase below lists goals, success criteria, deliverables, common mistakes, r
 
 | | |
 |---|---|
+| **Status** | **Complete** |
 | **Goals** | Scan `public/gallery`; emit manifest; types; sample images; collection meta fields |
 | **Success criteria** | Adding a file regenerates manifest in dev; dimensions present; app can read JSON |
-| **Deliverables** | Vite plugin, `GalleryItem` types, sample photos, optional collection meta schema |
+| **Deliverables (as shipped)** | `src/vite-plugins/galleryManifest.ts`; `public/gallery-manifest.json`; `public/gallery.json` collection meta; typed `GalleryManifest` / `GalleryItem`; `GalleryProvider` load + `reload`; sample PNGs; `npm run gallery:manifest` |
 | **Common mistakes** | Runtime directory listing in the browser; blocking UI thread on huge sync scans without care |
 | **Review checklist** | Offline; schema documented; Glossary terms (`Manifest`, `Photograph`) |
-| **Expected commits** | `feat: gallery manifest vite plugin` → `chore: add sample gallery images` |
+| **Commits** | Types/utils → plugin → context/HomePage → samples |
 
 ---
 
