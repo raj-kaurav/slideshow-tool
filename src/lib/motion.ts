@@ -17,6 +17,12 @@ export const motion = {
   hover: 200,
   staggerMin: 15,
   staggerMax: 25,
+  /** Ambient breathing cycle length (ms) — 8–12s range */
+  breathePeriodMin: 8000,
+  breathePeriodMax: 12000,
+  /** Ambient pointer parallax amplitude (px) */
+  parallaxMin: 3,
+  parallaxMax: 8,
 } as const
 
 export const ease = {
@@ -38,9 +44,13 @@ export const motionLimits = {
   maxHoverScale: 1.02,
   maxRevealMovePx: 40,
   revealScaleFrom: 0.97,
+  minRevealMovePx: 20,
   maxParallaxPx: 8,
+  minParallaxPx: 3,
+  breatheAmplitudePx: 1,
   kenBurnsEnd: 1.04,
   navSlidePercent: 0.08,
   dominantTintMin: 0.03,
   dominantTintMax: 0.05,
+  hoverBrightness: 1.06,
 } as const

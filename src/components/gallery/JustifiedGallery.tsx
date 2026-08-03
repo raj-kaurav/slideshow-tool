@@ -4,7 +4,11 @@ import { useWindowVirtualizer } from '@tanstack/react-virtual'
 import { GalleryRow } from '@/components/gallery/GalleryRow'
 import { useGallery } from '@/context/GalleryContext'
 import { useContainerWidth } from '@/hooks/useContainerWidth'
+import { useGalleryAmbient } from '@/hooks/useGalleryAmbient'
+import { useGalleryReveal } from '@/hooks/useGalleryReveal'
+import { useMediaQuery } from '@/hooks/useMediaQuery'
 import { computeGalleryLayout } from '@/lib/justified'
+import { computeWaveOrder } from '@/lib/waveOrder'
 import type { GalleryItem } from '@/types/gallery'
 
 function buildItemsById(items: GalleryItem[]): ReadonlyMap<string, GalleryItem> {
@@ -28,21 +32,44 @@ function rowStride(
 }
 
 /**
- * Virtualized justified gallery wall.
- * Consumes GalleryContext + layout engine. No wave / hover / viewer.
+ * Virtualized justified gallery wall with wave reveal + ambient life.
+ * No viewer / search / favorites.
  */
 export function JustifiedGallery() {
   const { items, loading, error, reload } = useGallery()
   const { ref: widthRef, width } = useContainerWidth<HTMLDivElement>()
   const listRef = useRef<HTMLDivElement | null>(null)
+  const planeRef = useRef<HTMLDivElement | null>(null)
   const [scrollMargin, setScrollMargin] = useState(0)
+  const reducedMotion = useMediaQuery('(prefers-reduced-motion: reduce)')
+
+  /** Freeze first ready layout signature for wave order — resize must not rebuild order mid-session. */
+  const initialWaveRef = useRef<ReturnType<typeof computeWaveOrder> | null>(null)
 
   const layout = useMemo(() => {
     if (width <= 0 || items.length === 0) return null
     return computeGalleryLayout(items, width)
   }, [items, width])
 
+  if (layout && !initialWaveRef.current) {
+    initialWaveRef.current = computeWaveOrder(layout.cells)
+  }
+
   const itemsById = useMemo(() => buildItemsById(items), [items])
+  const layoutReady = layout != null && layout.itemCount > 0
+
+  const { revealComplete, hideUntilRevealed } = useGalleryReveal({
+    rootRef: planeRef,
+    waveOrder: initialWaveRef.current,
+    reducedMotion,
+    layoutReady,
+  })
+
+  useGalleryAmbient({
+    planeRef,
+    reducedMotion,
+    enabled: revealComplete && layoutReady,
+  })
 
   const setContainerRef = (node: HTMLDivElement | null) => {
     widthRef(node)
@@ -92,11 +119,11 @@ export function JustifiedGallery() {
     return (
       <div
         ref={setContainerRef}
-        className="w-full px-[var(--page-inset)] py-[var(--space-6)] text-[color:var(--text-muted)]"
+        className="mx-auto w-full max-w-[var(--content-max)] px-[var(--page-inset)] py-[var(--space-6)] text-[color:var(--text-muted)]"
         aria-busy="true"
         aria-live="polite"
       >
-        Loading collection…
+        Preparing collection…
       </div>
     )
   }
@@ -105,7 +132,7 @@ export function JustifiedGallery() {
     return (
       <div
         ref={setContainerRef}
-        className="w-full px-[var(--page-inset)] py-[var(--space-6)] text-[color:var(--text-muted)]"
+        className="mx-auto w-full max-w-[var(--content-max)] px-[var(--page-inset)] py-[var(--space-6)] text-[color:var(--text-muted)]"
         role="alert"
       >
         <p>Unable to load collection — {error}</p>
@@ -124,7 +151,7 @@ export function JustifiedGallery() {
     return (
       <div
         ref={setContainerRef}
-        className="w-full px-[var(--page-inset)] py-[var(--space-6)] text-[color:var(--text-muted)]"
+        className="mx-auto w-full max-w-[var(--content-max)] px-[var(--page-inset)] py-[var(--space-6)] text-[color:var(--text-muted)]"
       >
         <p>Add photographs to public/gallery/ to begin.</p>
       </div>
@@ -134,18 +161,33 @@ export function JustifiedGallery() {
   const virtualRows = virtualizer.getVirtualItems()
 
   return (
-    <section ref={setContainerRef} className="w-full" aria-label="Photograph gallery">
+    <section
+      ref={setContainerRef}
+      className="mx-auto w-full max-w-[var(--content-max)]"
+      aria-label="Photograph gallery"
+    >
       <div
+        ref={planeRef}
         role="list"
         aria-label="Photographs"
-        className="relative w-full"
+        className="relative w-full will-change-transform"
         style={{ height: layout.totalHeight }}
       >
-        {virtualRows.map((virtualRow) => {
-          const row = layout.rows[virtualRow.index]
-          if (!row) return null
-          return <GalleryRow key={row.index} row={row} itemsById={itemsById} />
-        })}
+        <div data-breathe-layer="" className="relative h-full w-full will-change-transform">
+          {virtualRows.map((virtualRow) => {
+            const row = layout.rows[virtualRow.index]
+            if (!row) return null
+            return (
+              <GalleryRow
+                key={row.index}
+                row={row}
+                itemsById={itemsById}
+                hideUntilRevealed={hideUntilRevealed}
+                reducedMotion={reducedMotion}
+              />
+            )
+          })}
+        </div>
       </div>
     </section>
   )

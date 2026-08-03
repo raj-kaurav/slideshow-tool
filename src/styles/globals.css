@@ -53,7 +53,14 @@
   body {
     margin: 0;
     min-height: 100%;
+    /* Subtle charcoal radial depth — almost invisible */
     background-color: var(--bg);
+    background-image: radial-gradient(
+      ellipse 120% 90% at 50% -20%,
+      #181818 0%,
+      transparent 55%
+    );
+    background-attachment: fixed;
     color: var(--text);
     font-family: var(--font-ui);
     font-size: var(--text-body);
@@ -83,5 +90,43 @@
     html.lenis {
       scroll-behavior: auto;
     }
+  }
+}
+
+@layer components {
+  @keyframes skeleton-shimmer {
+    0% {
+      background-position: 100% 0;
+    }
+    100% {
+      background-position: -100% 0;
+    }
+  }
+
+  .skeleton-shimmer {
+    background-color: var(--skeleton-base);
+    background-image: linear-gradient(
+      105deg,
+      var(--skeleton-base) 0%,
+      var(--skeleton-base) 40%,
+      var(--skeleton-highlight) 50%,
+      var(--skeleton-base) 60%,
+      var(--skeleton-base) 100%
+    );
+    background-size: 200% 100%;
+    animation: skeleton-shimmer 2.4s ease-in-out infinite;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .skeleton-shimmer {
+      animation: none;
+      background-image: none;
+    }
+  }
+
+  /* Wave reveal — hide content until GSAP settles or data-revealed is set.
+     Inline GSAP styles win during animation; do not fight them from React. */
+  [data-reveal-surface]:not([data-revealed]) {
+    opacity: 0;
   }
 }

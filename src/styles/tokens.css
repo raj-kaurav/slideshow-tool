@@ -39,9 +39,17 @@
   --space-8: 64px;
   --page-inset: clamp(16px, 3vw, 48px);
   --gallery-gap: 10px;
+  /* Ultra-wide content cap — Visual Language 1800–2200px */
+  --content-max: 2000px;
+  /* Very subtle image corner radius */
+  --radius-image: 2px;
 
   /* Elevation */
   --shadow-hover: 0 8px 24px rgba(0, 0, 0, 0.35);
+
+  /* Skeleton */
+  --skeleton-base: #141414;
+  --skeleton-highlight: #1c1c1c;
 
   /* Motion durations */
   --motion-instant: 100ms;
@@ -60,6 +68,8 @@
   --motion-hover: 200ms;
   --motion-stagger-min: 15ms;
   --motion-stagger-max: 25ms;
+  --motion-breathe-period-min: 8s;
+  --motion-breathe-period-max: 12s;
 
   /* Motion easings */
   --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);

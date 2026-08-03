@@ -17,6 +17,9 @@ function buildMetaLine(meta: CollectionMeta, imageCount?: number): string | null
   return parts.length > 0 ? parts.join(' · ') : null
 }
 
+/**
+ * Editorial collection header — present, then quiet so the wall leads.
+ */
 export function CollectionHeader({
   productName,
   collectionMeta = {},
@@ -25,17 +28,17 @@ export function CollectionHeader({
   const metaLine = buildMetaLine(collectionMeta, imageCount)
 
   return (
-    <header className="px-[var(--page-inset)] pt-[var(--space-8)] pb-[var(--space-7)]">
-      <h1 className="font-display text-[length:var(--text-display)] leading-[1.1] tracking-[-0.02em] text-[color:var(--text)]">
+    <header className="mx-auto w-full max-w-[var(--content-max)] px-[var(--page-inset)] pt-[var(--space-7)] pb-[var(--space-7)]">
+      <h1 className="font-display text-[length:var(--text-display)] leading-[1.08] tracking-[-0.02em] text-[color:var(--text)]">
         {productName}
       </h1>
       {collectionMeta.title ? (
-        <h2 className="mt-[var(--space-3)] font-display text-[length:var(--text-heading)] leading-[1.2] text-[color:var(--text)]">
+        <h2 className="mt-[var(--space-2)] font-display text-[length:var(--text-heading)] font-normal leading-[1.25] text-[color:var(--text-muted)]">
           {collectionMeta.title}
         </h2>
       ) : null}
       {metaLine ? (
-        <p className="mt-[var(--space-4)] text-[length:var(--text-body-lg)] text-[color:var(--text-muted)]">
+        <p className="mt-[var(--space-3)] text-[length:var(--text-caption)] tracking-[0.01em] text-[color:var(--text-faint)]">
           {metaLine}
         </p>
       ) : null}
