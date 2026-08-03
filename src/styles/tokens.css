@@ -44,8 +44,11 @@
   /* Very subtle image corner radius */
   --radius-image: 2px;
 
-  /* Elevation */
-  --shadow-hover: 0 8px 24px rgba(0, 0, 0, 0.35);
+  /* Viewer dark-room backdrop */
+  --viewer-blur: 26px;
+  --viewer-blur-reduced: 12px;
+  --viewer-veil: 0.7;
+  --shadow-viewer-photo: 0 24px 64px rgba(0, 0, 0, 0.55), 0 2px 8px rgba(0, 0, 0, 0.35);
 
   /* Skeleton */
   --skeleton-base: #141414;
