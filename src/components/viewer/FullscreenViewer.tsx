@@ -1,53 +1,108 @@
-import { useEffect, useId, useRef } from 'react'
+import { useCallback, useEffect, useId, useMemo, useRef, useState, type FocusEvent } from 'react'
 import { createPortal } from 'react-dom'
 import { AnimatePresence, motion } from 'framer-motion'
-import { IoCloseOutline } from 'react-icons/io5'
 
 import { BackgroundLayer } from '@/components/viewer/BackgroundLayer'
 import { ExpandingImage } from '@/components/viewer/ExpandingImage'
-import { IconButton } from '@/components/ui/IconButton'
+import { ViewerChrome } from '@/components/viewer/ViewerChrome'
 import { useGallery } from '@/context/GalleryContext'
 import { useViewer } from '@/context/ViewerContext'
+import { useAutoHideUI } from '@/hooks/useAutoHideUI'
+import { useDominantColor } from '@/hooks/useDominantColor'
 import { useMediaQuery } from '@/hooks/useMediaQuery'
 import { motion as motionTokens } from '@/lib/motion'
 
 /**
- * Dark-room viewer shell — entry/exit only (Phase 4A).
- * No nav, zoom, chrome auto-hide, counter, or slideshow.
+ * Premium dark-room viewer — visual quality + chrome (no nav/zoom/slideshow/metadata).
  */
 export function FullscreenViewer() {
   const { items } = useGallery()
   const { isOpen, currentId, close, completeClose } = useViewer()
   const reducedMotion = useMediaQuery('(prefers-reduced-motion: reduce)')
   const titleId = useId()
+  const liveId = useId()
   const closeRef = useRef<HTMLButtonElement>(null)
+  const downloadRef = useRef<HTMLAnchorElement>(null)
   const dialogRef = useRef<HTMLDivElement>(null)
+  const [chromeReady, setChromeReady] = useState(false)
+  const [chromeFocused, setChromeFocused] = useState(false)
 
   const item = currentId ? items.find((entry) => entry.id === currentId) : undefined
   const visible = isOpen && item != null
 
+  const index = useMemo(() => {
+    if (!item) return 0
+    return items.findIndex((entry) => entry.id === item.id)
+  }, [item, items])
+
+  const current = index >= 0 ? index + 1 : 1
+  const total = Math.max(1, items.length)
+
+  const { color: tintColor } = useDominantColor(item?.src)
+  const { chromeVisible, onActivity } = useAutoHideUI({
+    enabled: visible && chromeReady,
+    allowHide: !chromeFocused,
+  })
+
   useEffect(() => {
     if (!isOpen) return
     if (item) return
-    // Invalid id — release lock immediately
     close()
     completeClose()
   }, [isOpen, item, close, completeClose])
 
   useEffect(() => {
+    if (!visible) {
+      setChromeReady(false)
+      setChromeFocused(false)
+      return
+    }
+
+    // Reduced motion: show chrome promptly. Otherwise wait for photograph settle.
+    if (reducedMotion) {
+      const t = window.setTimeout(() => setChromeReady(true), motionTokens.fast)
+      return () => window.clearTimeout(t)
+    }
+
+    // Fallback if layout animation callback never fires
+    const fallback = window.setTimeout(() => setChromeReady(true), motionTokens.viewerExpand + 80)
+    return () => window.clearTimeout(fallback)
+  }, [visible, item?.id, reducedMotion])
+
+  const onPhotoSettle = useCallback(() => {
+    setChromeReady(true)
+  }, [])
+
+  useEffect(() => {
     if (!visible) return
 
     const onKeyDown = (event: KeyboardEvent) => {
+      onActivity()
+
       if (event.key === 'Escape') {
         event.preventDefault()
         event.stopPropagation()
         close()
+        return
+      }
+
+      // Reserved — navigation logic arrives in a later phase
+      if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
+        event.preventDefault()
+        return
+      }
+
+      // Reserved download shortcut — triggers the download control
+      if (event.key === 'd' || event.key === 'D') {
+        if (event.metaKey || event.ctrlKey || event.altKey) return
+        event.preventDefault()
+        downloadRef.current?.click()
       }
     }
 
     window.addEventListener('keydown', onKeyDown)
     return () => window.removeEventListener('keydown', onKeyDown)
-  }, [visible, close])
+  }, [visible, close, onActivity])
 
   useEffect(() => {
     if (!visible) return
@@ -65,7 +120,7 @@ export function FullscreenViewer() {
     const onFocusTrap = (event: KeyboardEvent) => {
       if (event.key !== 'Tab') return
       const focusable = dialog.querySelectorAll<HTMLElement>(
-        'button:not([disabled]), [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
+        'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])',
       )
       if (focusable.length === 0) return
       const first = focusable[0]
@@ -83,7 +138,25 @@ export function FullscreenViewer() {
 
     dialog.addEventListener('keydown', onFocusTrap)
     return () => dialog.removeEventListener('keydown', onFocusTrap)
-  }, [visible, item?.id])
+  }, [visible, item?.id, chromeReady])
+
+  const onChromeFocus = useCallback(() => setChromeFocused(true), [])
+  const onChromeBlur = useCallback((event: FocusEvent) => {
+    const next = event.relatedTarget as Node | null
+    if (event.currentTarget.contains(next)) return
+    setChromeFocused(false)
+  }, [])
+
+  // Reserved stubs — wired for chrome affordances; logic later
+  const onPrev = useCallback(() => {
+    onActivity()
+  }, [onActivity])
+  const onNext = useCallback(() => {
+    onActivity()
+  }, [onActivity])
+  const onInfo = useCallback(() => {
+    onActivity()
+  }, [onActivity])
 
   if (typeof document === 'undefined') return null
 
@@ -92,7 +165,14 @@ export function FullscreenViewer() {
   return createPortal(
     <>
       <AnimatePresence>
-        {visible ? <BackgroundLayer key="viewer-bg" reducedMotion={reducedMotion} /> : null}
+        {visible && item ? (
+          <BackgroundLayer
+            key="viewer-bg"
+            src={item.src}
+            reducedMotion={reducedMotion}
+            tintColor={tintColor}
+          />
+        ) : null}
       </AnimatePresence>
 
       <AnimatePresence onExitComplete={completeClose}>
@@ -103,9 +183,11 @@ export function FullscreenViewer() {
             role="dialog"
             aria-modal="true"
             aria-labelledby={titleId}
+            aria-describedby={liveId}
             className="fixed inset-0 z-[100]"
             initial={false}
             exit={{ transition: { duration: exitMs } }}
+            onPointerMove={onActivity}
           >
             <button
               type="button"
@@ -118,23 +200,37 @@ export function FullscreenViewer() {
             <h2 id={titleId} className="sr-only">
               {item.filename}
             </h2>
+            <p id={liveId} className="sr-only" aria-live="polite">
+              Image {current} of {total}
+            </p>
 
             <div className="pointer-events-none absolute inset-0 z-[2] flex items-center justify-center">
               <div className="pointer-events-auto h-full w-full">
-                <ExpandingImage item={item} reducedMotion={reducedMotion} />
+                <ExpandingImage
+                  item={item}
+                  reducedMotion={reducedMotion}
+                  onSettle={onPhotoSettle}
+                />
               </div>
             </div>
 
-            <div className="absolute top-[var(--space-4)] right-[var(--space-4)] z-[3]">
-              <IconButton
-                ref={closeRef}
-                aria-label="Close viewer"
-                onClick={close}
-                className="bg-[color:var(--toolbar)] text-[color:var(--text)] backdrop-blur-sm"
-              >
-                <IoCloseOutline size={24} aria-hidden />
-              </IconButton>
-            </div>
+            <ViewerChrome
+              visible={chromeVisible}
+              ready={chromeReady}
+              filename={item.filename}
+              src={item.src}
+              current={current}
+              total={total}
+              reducedMotion={reducedMotion}
+              closeRef={closeRef}
+              downloadRef={downloadRef}
+              onClose={close}
+              onPrev={onPrev}
+              onNext={onNext}
+              onInfo={onInfo}
+              onChromeFocus={onChromeFocus}
+              onChromeBlur={onChromeBlur}
+            />
           </motion.div>
         ) : null}
       </AnimatePresence>

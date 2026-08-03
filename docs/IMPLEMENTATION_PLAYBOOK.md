@@ -88,11 +88,11 @@ Split in practice:
 
 | | |
 |---|---|
-| **Status** | **Complete** |
+| **Status** | **Complete** (+ visual quality pass) |
 | **Goals** | Shared-element open/close; dark-room shell; scroll + focus restore; Escape |
-| **Deliverables** | `FullscreenViewer`, `ExpandingImage`, `BackgroundLayer`; gallery activate; wall desaturate |
-| **Non-goals** | Nav, zoom, counter, tint, toolbar, download, metadata, slideshow |
-| **Success criteria** | Spatial continuity; Esc reverse close; focus returns to cell; typecheck/build pass |
+| **Deliverables** | `FullscreenViewer`, `ExpandingImage`, `BackgroundLayer`, `ViewerChrome`, `AnimatedCounter`, `useAutoHideUI`, tint architecture stub |
+| **Non-goals** | Nav logic, zoom, slideshow, metadata panel |
+| **Success criteria** | Spatial continuity; blurred backdrop; auto-hide chrome; typecheck/build pass |
 
 ### Phase 4B — Deferred toolbar (pending)
 
