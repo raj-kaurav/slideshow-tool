@@ -68,12 +68,15 @@ Split in practice:
 | **Non-goals** | Wave reveal, hover, viewer, toolbar, Framer/GSAP |
 | **Success criteria** | Reserved geometry; lazy + async decode; reduced-motion instant show; typecheck/build pass |
 
-### Phase 3D — Wave reveal / interaction polish (pending)
+### Phase 3D — Gallery experience (motion + ambient + polish)
 
 | | |
 |---|---|
-| **Goals** | Priority wave reveal, ImageCard hover/open affordances as Experience docs specify |
-| **Expected commits** | `feat: priority wave reveal` → `feat: image card interactions` |
+| **Status** | **Complete** |
+| **Goals** | Priority wave reveal; hover elevation; ambient parallax + breathing; visual polish |
+| **Deliverables** | `ImageCard`, `waveOrder`, `galleryReveal`, `useGalleryReveal`, `useGalleryAmbient`; polished header/skeleton/bg |
+| **Non-goals** | Viewer open, toolbar, search, favorites, slideshow, metadata |
+| **Success criteria** | Assemble ~1.5s once; no replay on resize; reduced-motion path; typecheck/build pass |
 
 ---
 
@@ -159,12 +162,11 @@ Split in practice:
 
 | | |
 |---|---|
-| **Goals** | Breathing, ambient parallax, a11y pass, responsive hardening |
-| **Success criteria** | Breathing nearly imperceptible; parallax ≤8px; Quality Checklist green |
-| **Deliverables** | `useBreathing`, `useAmbientParallax`, a11y fixes, responsive tweaks |
-| **Common mistakes** | Obvious looping float; shipping without reduced-motion off switches |
-| **Review checklist** | Full [QUALITY_CHECKLIST.md](./QUALITY_CHECKLIST.md); Testing Strategy manual QA |
-| **Expected commits** | `feat: ambient parallax and breathing` → `fix: a11y and responsive polish` |
+| **Status** | **Partially complete (ambient absorbed into 3D)** |
+| **Goals** | Remaining QA hardening beyond gallery experience ambient/motion |
+| **Success criteria** | Full Quality Checklist green before V1 ship |
+| **Deliverables** | Broader a11y/responsive QA; any leftover polish not covered in 3D |
+| **Note** | Wave reveal, hover, parallax, breathing, and gallery visual polish shipped in **Phase 3D** |
 
 ---
 

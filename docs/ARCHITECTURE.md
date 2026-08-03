@@ -321,13 +321,13 @@ Sequence unchanged — experience details live in other docs. Guidance: [IMPLEME
 
 1. **Done** — Scaffold + tokens/fonts + providers + Lenis shell  
 2. **Done** — Manifest plugin + types + sample images + collection meta fields  
-3. **3A–3C done / 3D pending** — Layout engine + virtualized wall + progressive image loading; wave/hover next  
+3. **Done** — Layout engine + virtualized wall + progressive loading + gallery experience (wave / hover / ambient / polish)  
 4. Deferred toolbar (search, sort, favorites)  
 5. Dark-room viewer + shared-element + wall desaturate + dominant tint  
 6. Nav + N±1 preload + slide-fades + animated counter  
 7. Zoom/pan/fit/actual + background modes + auto-hide chrome  
 8. Exhibition slideshow + Ken Burns  
 9. Download + EXIF sidebar + persistence  
-10. Breathing + ambient parallax + a11y + responsive hardening  
+10. **Partially absorbed into 3D** — Breathing + ambient parallax + a11y + responsive hardening (remaining: broader QA hardening) 
 
 **Out of scope V1:** sound, CMS, upload UI, server resizing, accounts, Three.js, landing gates.
