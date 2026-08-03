@@ -80,7 +80,21 @@ Split in practice:
 
 ---
 
-## Phase 4 — Deferred toolbar
+## Phase 4 — Viewer entry & deferred toolbar
+
+Split in practice:
+
+### Phase 4A — Viewer entry & exit
+
+| | |
+|---|---|
+| **Status** | **Complete** |
+| **Goals** | Shared-element open/close; dark-room shell; scroll + focus restore; Escape |
+| **Deliverables** | `FullscreenViewer`, `ExpandingImage`, `BackgroundLayer`; gallery activate; wall desaturate |
+| **Non-goals** | Nav, zoom, counter, tint, toolbar, download, metadata, slideshow |
+| **Success criteria** | Spatial continuity; Esc reverse close; focus returns to cell; typecheck/build pass |
+
+### Phase 4B — Deferred toolbar (pending)
 
 | | |
 |---|---|
@@ -93,16 +107,17 @@ Split in practice:
 
 ---
 
-## Phase 5 — Dark room viewer + shared element
+## Phase 5 — Dark room viewer polish
 
 | | |
 |---|---|
-| **Goals** | Open/close FLIP; wall desaturate; dominant tint; viewer shell |
-| **Success criteria** | Spatial continuity; tint 3–5%; Esc reverse close; focus trap |
-| **Deliverables** | `FullscreenViewer`, `ExpandingImage`, `BackgroundLayer`, `useDominantColor` |
-| **Common mistakes** | Center fade modal; pure `#000` only; tint too strong; hard-cut close |
-| **Review checklist** | Animation Spec Open/Close; a11y dialog; Design Decisions tint/charcoal |
-| **Expected commits** | `feat: fullscreen viewer shell` → `feat: shared-element open close` → `feat: dominant color tint` |
+| **Goals** | Dominant tint; remaining viewer shell polish beyond 4A entry/exit |
+| **Success criteria** | Tint 3–5%; spatial continuity preserved |
+| **Deliverables** | `useDominantColor`; tinted `BackgroundLayer` |
+| **Common mistakes** | Tint too strong; hard-cut close |
+| **Review checklist** | Animation Spec Open/Close; Design Decisions tint/charcoal |
+| **Expected commits** | `feat: dominant color tint` |
+| **Note** | Shared-element open/close + viewer shell shipped in **Phase 4A** |
 
 ---
 
