@@ -237,7 +237,7 @@ Thumbnail / display-sized decode  →  Medium (wall)  →  Fullscreen stage  →
 | **Preloading** | Viewer: **only N−1 and N+1**. Never entire album |
 | **Memory** | Unmount offscreen wall imgs via virtualization; tear down stage on close; cap zoom bitmap pressure |
 | **Transitions** | Do not swap sources mid-FLIP; promote to fullscreen src after expand when needed |
-| **Progressive** | Skeleton → blur-up → full (Experience Level 4) |
+| **Progressive** | Skeleton → optional blur placeholder (`placeholderSrc`) → full image opacity fade (Phase 3C) |
 | **Future responsive** | Optional build step for `srcset` widths; V1 may serve originals constrained by CSS/`sizes` |
 
 Download always uses **original** bytes — no re-encode.
@@ -321,7 +321,7 @@ Sequence unchanged — experience details live in other docs. Guidance: [IMPLEME
 
 1. **Done** — Scaffold + tokens/fonts + providers + Lenis shell  
 2. **Done** — Manifest plugin + types + sample images + collection meta fields  
-3. **3A–3B done / 3C pending** — Justified layout engine + virtualized wall; wave/ImageCard next  
+3. **3A–3C done / 3D pending** — Layout engine + virtualized wall + progressive image loading; wave/hover next  
 4. Deferred toolbar (search, sort, favorites)  
 5. Dark-room viewer + shared-element + wall desaturate + dominant tint  
 6. Nav + N±1 preload + slide-fades + animated counter  

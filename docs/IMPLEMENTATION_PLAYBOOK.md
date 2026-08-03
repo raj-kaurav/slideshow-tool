@@ -58,12 +58,22 @@ Split in practice:
 | **Non-goals** | Wave reveal, hover, ImageCard interactions, blur-up, viewer, toolbar |
 | **Success criteria** | Smooth scroll; ResizeObserver-driven layout; semantic list; typecheck/build pass |
 
-### Phase 3C — ImageCard / reveal polish (pending)
+### Phase 3C — Image loading & GalleryCell enhancement
 
 | | |
 |---|---|
-| **Goals** | ImageCard behaviour, wave reveal, placeholders polish as specified in Experience docs |
-| **Expected commits** | `feat: image card` → `feat: priority wave reveal` |
+| **Status** | **Complete** |
+| **Goals** | Lazy load, skeleton, optional blur slot, opacity fade-in, error fallback; zero CLS |
+| **Deliverables** | Enhanced `GalleryCell`, `GalleryCellFallback`, `useImageLoad`, `objectFit` helpers |
+| **Non-goals** | Wave reveal, hover, viewer, toolbar, Framer/GSAP |
+| **Success criteria** | Reserved geometry; lazy + async decode; reduced-motion instant show; typecheck/build pass |
+
+### Phase 3D — Wave reveal / interaction polish (pending)
+
+| | |
+|---|---|
+| **Goals** | Priority wave reveal, ImageCard hover/open affordances as Experience docs specify |
+| **Expected commits** | `feat: priority wave reveal` → `feat: image card interactions` |
 
 ---
 
