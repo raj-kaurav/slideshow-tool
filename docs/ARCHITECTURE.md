@@ -322,8 +322,8 @@ Sequence unchanged — experience details live in other docs. Guidance: [IMPLEME
 1. **Done** — Scaffold + tokens/fonts + providers + Lenis shell  
 2. **Done** — Manifest plugin + types + sample images + collection meta fields  
 3. **Done** — Layout engine + virtualized wall + progressive loading + gallery experience (wave / hover / ambient / polish)  
-4. Deferred toolbar (search, sort, favorites)  
-5. Dark-room viewer + shared-element + wall desaturate + dominant tint  
+4. **4A done / 4B pending** — Viewer entry/exit (shared element); deferred toolbar next  
+5. Dominant tint + remaining viewer polish  
 6. Nav + N±1 preload + slide-fades + animated counter  
 7. Zoom/pan/fit/actual + background modes + auto-hide chrome  
 8. Exhibition slideshow + Ken Burns  

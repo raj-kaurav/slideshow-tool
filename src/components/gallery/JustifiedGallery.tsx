@@ -3,6 +3,7 @@ import { useWindowVirtualizer } from '@tanstack/react-virtual'
 
 import { GalleryRow } from '@/components/gallery/GalleryRow'
 import { useGallery } from '@/context/GalleryContext'
+import { useViewer } from '@/context/ViewerContext'
 import { useContainerWidth } from '@/hooks/useContainerWidth'
 import { useGalleryAmbient } from '@/hooks/useGalleryAmbient'
 import { useGalleryReveal } from '@/hooks/useGalleryReveal'
@@ -33,10 +34,12 @@ function rowStride(
 
 /**
  * Virtualized justified gallery wall with wave reveal + ambient life.
- * No viewer / search / favorites.
+ * Opens the dark-room viewer via ImageCard activation (Phase 4A).
  */
 export function JustifiedGallery() {
   const { items, loading, error, reload } = useGallery()
+  const { isOpen, currentId } = useViewer()
+  const wallInactive = isOpen || currentId != null
   const { ref: widthRef, width } = useContainerWidth<HTMLDivElement>()
   const listRef = useRef<HTMLDivElement | null>(null)
   const planeRef = useRef<HTMLDivElement | null>(null)
@@ -68,7 +71,7 @@ export function JustifiedGallery() {
   useGalleryAmbient({
     planeRef,
     reducedMotion,
-    enabled: revealComplete && layoutReady,
+    enabled: revealComplete && layoutReady && !wallInactive,
   })
 
   const setContainerRef = (node: HTMLDivElement | null) => {
@@ -165,6 +168,7 @@ export function JustifiedGallery() {
       ref={setContainerRef}
       className="mx-auto w-full max-w-[var(--content-max)]"
       aria-label="Photograph gallery"
+      aria-hidden={wallInactive || undefined}
     >
       <div
         ref={planeRef}

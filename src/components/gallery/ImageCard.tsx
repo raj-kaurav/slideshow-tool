@@ -3,6 +3,7 @@ import { motion as fm } from 'framer-motion'
 
 import { GalleryCellFallback } from '@/components/gallery/GalleryCellFallback'
 import { Skeleton } from '@/components/ui/Skeleton'
+import { photoLayoutId, useViewer } from '@/context/ViewerContext'
 import { useImageLoad } from '@/hooks/useImageLoad'
 import { REVEAL_ID_ATTR, REVEAL_SURFACE_ATTR, REVEALED_ATTR } from '@/lib/galleryReveal'
 import { ease, motion, motionLimits, spring } from '@/lib/motion'
@@ -13,26 +14,14 @@ import type { GalleryCell as GalleryCellGeometry } from '@/types/layout'
 export type ImageCardProps = {
   cell: GalleryCellGeometry
   item: GalleryItem | undefined
-  /**
-   * Optional low-quality / blurred placeholder URL (LQIP).
-   * When omitted, the skeleton remains until the full image loads.
-   */
   placeholderSrc?: string
-  /**
-   * When true, CSS keeps the surface hidden until GSAP / settle marks it revealed.
-   * After assemble, late virtualized mounts settle via MutationObserver.
-   */
   hideUntilRevealed?: boolean
   reducedMotion?: boolean
-  /** Keyboard focus on the wrapping figure — same elevation as pointer hover */
   focusElevated?: boolean
 }
 
 /**
- * Photograph inside a reserved cell — progressive load, hover elevation, wave surface.
- * Does not open the viewer (Phase 4+).
- *
- * Layering (outer → inner): reveal surface → parallax cell → hover plane → media
+ * Photograph inside a reserved cell — load, hover, reveal, shared-element handoff.
  */
 function ImageCardComponent({
   cell,
@@ -46,7 +35,10 @@ function ImageCardComponent({
   const src = item?.src
   const orientation = item?.orientation ?? 'landscape'
   const [hovered, setHovered] = useState(false)
-  const elevated = hovered || focusElevated
+  const { isOpen, currentId } = useViewer()
+
+  const sharedAway = Boolean(item && isOpen && currentId === item.id)
+  const elevated = (hovered || focusElevated) && !sharedAway
 
   const { status, imgKey, onLoad, onError, retry, syncFromElement } = useImageLoad(src)
 
@@ -57,10 +49,11 @@ function ImageCardComponent({
   const height = Math.max(1, Math.round(cell.height))
   const sizes = `${width}px`
 
-  const showSkeleton = Boolean(src) && status !== 'loaded' && status !== 'error'
-  const showPlaceholder = Boolean(placeholderSrc) && status !== 'loaded' && status !== 'error'
+  const showSkeleton = Boolean(src) && status !== 'loaded' && status !== 'error' && !sharedAway
+  const showPlaceholder = Boolean(placeholderSrc) && status !== 'loaded' && status !== 'error' && !sharedAway
   const showError = status === 'error'
   const imageOpacity = status === 'loaded' ? 1 : 0
+  const showSharedImage = Boolean(src) && !showError && !sharedAway
 
   const fadeTransition = reducedMotion
     ? undefined
@@ -84,6 +77,9 @@ function ImageCardComponent({
         scale: motionLimits.maxHoverScale,
         filter: `brightness(${motionLimits.hoverBrightness})`,
       }
+
+  const layoutId =
+    item && !reducedMotion && status === 'loaded' ? photoLayoutId(item.id) : undefined
 
   return (
     <div
@@ -127,10 +123,11 @@ function ImageCardComponent({
             />
           ) : null}
 
-          {src && !showError ? (
-            <img
+          {showSharedImage ? (
+            <fm.img
               key={imgKey}
               ref={handleRef}
+              layoutId={layoutId}
               src={src}
               alt={label}
               width={width}
@@ -146,14 +143,14 @@ function ImageCardComponent({
                 objectFit,
                 objectPosition,
                 opacity: imageOpacity,
-                transition: fadeTransition,
+                transition: layoutId ? undefined : fadeTransition,
               }}
+              transition={layoutId ? spring.shared : undefined}
             />
           ) : null}
 
           {showError ? <GalleryCellFallback label={label} onRetry={retry} /> : null}
 
-          {/* Optional filename — Animation Spec; quiet caption, not chrome overlay */}
           <span
             aria-hidden
             className={[

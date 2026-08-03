@@ -1,4 +1,7 @@
+import { LayoutGroup } from 'framer-motion'
+
 import { LenisRoot } from '@/components/LenisRoot'
+import { FullscreenViewer } from '@/components/viewer/FullscreenViewer'
 import { CursorProvider } from '@/context/CursorContext'
 import { GalleryProvider } from '@/context/GalleryContext'
 import { ViewerProvider } from '@/context/ViewerContext'
@@ -10,7 +13,10 @@ export function App() {
       <GalleryProvider>
         <ViewerProvider>
           <LenisRoot>
-            <HomePage />
+            <LayoutGroup id="gallery-experience">
+              <HomePage />
+              <FullscreenViewer />
+            </LayoutGroup>
           </LenisRoot>
         </ViewerProvider>
       </GalleryProvider>
