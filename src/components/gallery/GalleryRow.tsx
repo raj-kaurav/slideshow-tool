@@ -10,7 +10,8 @@ type GalleryRowProps = {
 }
 
 /**
- * Positions a single justified row. No hover / animation / loading logic.
+ * Positions a single justified row.
+ * Image loading lives in GalleryCell (Phase 3C).
  */
 function GalleryRowComponent({ row, itemsById }: GalleryRowProps) {
   return (
