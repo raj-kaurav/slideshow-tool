@@ -20,6 +20,8 @@ type ViewerContextValue = {
   backgroundMode: ViewerBackgroundMode
   slideshow: SlideshowSettings
   open: (id: string) => void
+  /** Change the active photograph without closing (in-viewer navigation). */
+  goTo: (id: string) => void
   close: () => void
   /**
    * Called by FullscreenViewer when the exit transition finishes.
@@ -81,6 +83,12 @@ export function ViewerProvider({ children }: ViewerProviderProps) {
     lockPageScroll()
   }, [])
 
+  const goTo = useCallback((id: string) => {
+    focusIdRef.current = id
+    writeJson('lastViewed', id)
+    setCurrentId(id)
+  }, [])
+
   const close = useCallback(() => {
     setIsOpen(false)
   }, [])
@@ -113,6 +121,7 @@ export function ViewerProvider({ children }: ViewerProviderProps) {
       backgroundMode,
       slideshow,
       open,
+      goTo,
       close,
       completeClose,
       setFitMode,
@@ -127,6 +136,7 @@ export function ViewerProvider({ children }: ViewerProviderProps) {
       backgroundMode,
       slideshow,
       open,
+      goTo,
       close,
       completeClose,
     ],
