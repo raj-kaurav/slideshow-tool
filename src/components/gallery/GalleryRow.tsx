@@ -7,13 +7,19 @@ import type { GalleryRow as GalleryRowGeometry } from '@/types/layout'
 type GalleryRowProps = {
   row: GalleryRowGeometry
   itemsById: ReadonlyMap<string, GalleryItem>
+  hideUntilRevealed?: boolean
+  reducedMotion?: boolean
 }
 
 /**
  * Positions a single justified row.
- * Image loading lives in GalleryCell (Phase 3C).
  */
-function GalleryRowComponent({ row, itemsById }: GalleryRowProps) {
+function GalleryRowComponent({
+  row,
+  itemsById,
+  hideUntilRevealed,
+  reducedMotion,
+}: GalleryRowProps) {
   return (
     <div
       role="presentation"
@@ -26,7 +32,13 @@ function GalleryRowComponent({ row, itemsById }: GalleryRowProps) {
       }}
     >
       {row.cells.map((cell) => (
-        <GalleryCell key={cell.id} cell={cell} item={itemsById.get(cell.id)} />
+        <GalleryCell
+          key={cell.id}
+          cell={cell}
+          item={itemsById.get(cell.id)}
+          hideUntilRevealed={hideUntilRevealed}
+          reducedMotion={reducedMotion}
+        />
       ))}
     </div>
   )

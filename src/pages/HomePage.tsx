@@ -3,13 +3,14 @@ import { JustifiedGallery } from '@/components/gallery/JustifiedGallery'
 import { useGallery } from '@/context/GalleryContext'
 
 /**
- * Phase 3B — gallery wall (structure only; no wave / hover / viewer).
+ * Home — collection header + premium gallery experience (Phase 3D).
+ * Viewer / toolbar / search arrive in later phases.
  */
 export function HomePage() {
   const { productName, collectionMeta, items, loading, error } = useGallery()
 
   return (
-    <main>
+    <main className="min-h-dvh">
       <CollectionHeader
         productName={productName}
         collectionMeta={collectionMeta}
