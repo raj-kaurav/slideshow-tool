@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useId, useMemo, useRef, useState, type FocusEvent } from 'react'
+import { useCallback, useEffect, useId, useRef, useState, type FocusEvent } from 'react'
 import { createPortal } from 'react-dom'
 import { AnimatePresence, motion } from 'framer-motion'
 
@@ -9,11 +9,13 @@ import { useGallery } from '@/context/GalleryContext'
 import { useViewer } from '@/context/ViewerContext'
 import { useAutoHideUI } from '@/hooks/useAutoHideUI'
 import { useDominantColor } from '@/hooks/useDominantColor'
+import { useImagePreload } from '@/hooks/useImagePreload'
 import { useMediaQuery } from '@/hooks/useMediaQuery'
-import { motion as motionTokens } from '@/lib/motion'
+import { useViewerNav } from '@/hooks/useViewerNav'
+import { motion as motionTokens, motionLimits } from '@/lib/motion'
 
 /**
- * Premium dark-room viewer — visual quality + chrome (no nav/zoom/slideshow/metadata).
+ * Premium dark-room viewer — navigation, tint, chrome, shared-element open/close.
  */
 export function FullscreenViewer() {
   const { items } = useGallery()
@@ -30,13 +32,19 @@ export function FullscreenViewer() {
   const item = currentId ? items.find((entry) => entry.id === currentId) : undefined
   const visible = isOpen && item != null
 
-  const index = useMemo(() => {
-    if (!item) return 0
-    return items.findIndex((entry) => entry.id === item.id)
-  }, [item, items])
+  const {
+    index,
+    current,
+    total,
+    canPrev,
+    canNext,
+    direction,
+    hasNavigated,
+    goPrev,
+    goNext,
+  } = useViewerNav(items)
 
-  const current = index >= 0 ? index + 1 : 1
-  const total = Math.max(1, items.length)
+  useImagePreload(items, index, visible)
 
   const { color: tintColor } = useDominantColor(item?.src)
   const { chromeVisible, onActivity } = useAutoHideUI({
@@ -51,6 +59,7 @@ export function FullscreenViewer() {
     completeClose()
   }, [isOpen, item, close, completeClose])
 
+  // Chrome ready on open settle — do not flash-reset on every nav
   useEffect(() => {
     if (!visible) {
       setChromeReady(false)
@@ -58,16 +67,16 @@ export function FullscreenViewer() {
       return
     }
 
-    // Reduced motion: show chrome promptly. Otherwise wait for photograph settle.
+    if (chromeReady) return
+
     if (reducedMotion) {
       const t = window.setTimeout(() => setChromeReady(true), motionTokens.fast)
       return () => window.clearTimeout(t)
     }
 
-    // Fallback if layout animation callback never fires
     const fallback = window.setTimeout(() => setChromeReady(true), motionTokens.viewerExpand + 80)
     return () => window.clearTimeout(fallback)
-  }, [visible, item?.id, reducedMotion])
+  }, [visible, reducedMotion, chromeReady])
 
   const onPhotoSettle = useCallback(() => {
     setChromeReady(true)
@@ -86,13 +95,18 @@ export function FullscreenViewer() {
         return
       }
 
-      // Reserved — navigation logic arrives in a later phase
-      if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
+      if (event.key === 'ArrowLeft') {
         event.preventDefault()
+        goPrev()
         return
       }
 
-      // Reserved download shortcut — triggers the download control
+      if (event.key === 'ArrowRight') {
+        event.preventDefault()
+        goNext()
+        return
+      }
+
       if (event.key === 'd' || event.key === 'D') {
         if (event.metaKey || event.ctrlKey || event.altKey) return
         event.preventDefault()
@@ -102,7 +116,7 @@ export function FullscreenViewer() {
 
     window.addEventListener('keydown', onKeyDown)
     return () => window.removeEventListener('keydown', onKeyDown)
-  }, [visible, close, onActivity])
+  }, [visible, close, onActivity, goPrev, goNext])
 
   useEffect(() => {
     if (!visible) return
@@ -110,7 +124,7 @@ export function FullscreenViewer() {
       closeRef.current?.focus()
     })
     return () => window.cancelAnimationFrame(frame)
-  }, [visible, item?.id])
+  }, [visible])
 
   useEffect(() => {
     if (!visible) return
@@ -138,7 +152,7 @@ export function FullscreenViewer() {
 
     dialog.addEventListener('keydown', onFocusTrap)
     return () => dialog.removeEventListener('keydown', onFocusTrap)
-  }, [visible, item?.id, chromeReady])
+  }, [visible, chromeReady])
 
   const onChromeFocus = useCallback(() => setChromeFocused(true), [])
   const onChromeBlur = useCallback((event: FocusEvent) => {
@@ -147,13 +161,16 @@ export function FullscreenViewer() {
     setChromeFocused(false)
   }, [])
 
-  // Reserved stubs — wired for chrome affordances; logic later
   const onPrev = useCallback(() => {
     onActivity()
-  }, [onActivity])
+    goPrev()
+  }, [goPrev, onActivity])
+
   const onNext = useCallback(() => {
     onActivity()
-  }, [onActivity])
+    goNext()
+  }, [goNext, onActivity])
+
   const onInfo = useCallback(() => {
     onActivity()
   }, [onActivity])
@@ -161,6 +178,7 @@ export function FullscreenViewer() {
   if (typeof document === 'undefined') return null
 
   const exitMs = (reducedMotion ? motionTokens.fast : motionTokens.viewerClose) / 1000
+  const imageMode = hasNavigated ? 'nav' : 'shared'
 
   return createPortal(
     <>
@@ -171,6 +189,7 @@ export function FullscreenViewer() {
             src={item.src}
             reducedMotion={reducedMotion}
             tintColor={tintColor}
+            tintStrength={motionLimits.dominantTintDefault}
           />
         ) : null}
       </AnimatePresence>
@@ -210,6 +229,8 @@ export function FullscreenViewer() {
                   item={item}
                   reducedMotion={reducedMotion}
                   onSettle={onPhotoSettle}
+                  mode={imageMode}
+                  direction={direction}
                 />
               </div>
             </div>
@@ -221,6 +242,8 @@ export function FullscreenViewer() {
               src={item.src}
               current={current}
               total={total}
+              canPrev={canPrev}
+              canNext={canNext}
               reducedMotion={reducedMotion}
               closeRef={closeRef}
               downloadRef={downloadRef}

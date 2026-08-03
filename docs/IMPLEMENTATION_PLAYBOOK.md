@@ -90,9 +90,9 @@ Split in practice:
 |---|---|
 | **Status** | **Complete** (+ visual quality pass) |
 | **Goals** | Shared-element open/close; dark-room shell; scroll + focus restore; Escape |
-| **Deliverables** | `FullscreenViewer`, `ExpandingImage`, `BackgroundLayer`, `ViewerChrome`, `AnimatedCounter`, `useAutoHideUI`, tint architecture stub |
-| **Non-goals** | Nav logic, zoom, slideshow, metadata panel |
-| **Success criteria** | Spatial continuity; blurred backdrop; auto-hide chrome; typecheck/build pass |
+| **Deliverables** | `FullscreenViewer`, `ExpandingImage`, `BackgroundLayer`, `ViewerChrome`, `AnimatedCounter`, `useAutoHideUI`, `useViewerNav`, `useImagePreload`, `useDominantColor` |
+| **Non-goals** | Zoom, slideshow, metadata panel, deferred toolbar |
+| **Success criteria** | Spatial continuity; blurred backdrop; auto-hide chrome; prev/next + arrows; dominant tint; typecheck/build pass |
 
 ### Phase 4B — Deferred toolbar (pending)
 

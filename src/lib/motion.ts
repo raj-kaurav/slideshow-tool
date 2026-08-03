@@ -51,6 +51,9 @@ export const motionLimits = {
   kenBurnsEnd: 1.04,
   navSlidePercent: 0.08,
   dominantTintMin: 0.03,
-  dominantTintMax: 0.05,
+  /** Upper bound raised to 8% per visual QA — still charcoal, never colorful */
+  dominantTintMax: 0.08,
+  /** Default mix when a dominant color is available */
+  dominantTintDefault: 0.06,
   hoverBrightness: 1.06,
 } as const

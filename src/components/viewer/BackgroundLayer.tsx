@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion'
+import { AnimatePresence, motion } from 'framer-motion'
 
 import { ease, motion as motionTokens, motionLimits } from '@/lib/motion'
 
@@ -7,29 +7,28 @@ type BackgroundLayerProps = {
   src?: string
   reducedMotion?: boolean
   /**
-   * Dominant color CSS value for tint architecture.
-   * When null, charcoal-only dark room (sampling deferred).
+   * Dominant color CSS value for tint.
+   * When null, charcoal-only dark room until sampling resolves.
    */
   tintColor?: string | null
   /**
    * Mix strength 0–1. Clamped to motionLimits dominant tint range when applied.
-   * Ignored when tintColor is null.
    */
   tintStrength?: number
 }
 
 /**
- * Dark-room backdrop: charcoal base + scaled blurred photograph + dark veil.
- * Optional tint layer is wired for dominant-color sampling (not active yet).
+ * Dark-room backdrop: charcoal + blurred photograph (crossfades on src change) + tint + veil.
  */
 export function BackgroundLayer({
   src,
   reducedMotion = false,
   tintColor = null,
-  tintStrength = motionLimits.dominantTintMin,
+  tintStrength = motionLimits.dominantTintDefault,
 }: BackgroundLayerProps) {
   const enterMs = (reducedMotion ? motionTokens.fast : motionTokens.viewerExpand) / 1000
   const exitMs = (reducedMotion ? motionTokens.fast : motionTokens.viewerClose) / 1000
+  const crossfadeMs = (reducedMotion ? motionTokens.fast : motionTokens.normal) / 1000
 
   const strength = Math.min(
     motionLimits.dominantTintMax,
@@ -51,39 +50,53 @@ export function BackgroundLayer({
       {/* Charcoal room base */}
       <div className="absolute inset-0 bg-[color:var(--viewer)]" />
 
-      {/* Blurred, desaturated, oversized photograph — never competes with the hero */}
-      {src ? (
-        <img
-          src={src}
-          alt=""
-          aria-hidden
-          decoding="async"
-          draggable={false}
-          className={[
-            'absolute inset-0 h-full w-full object-cover',
-            'scale-[1.18] saturate-[0.45] contrast-[0.92]',
-            reducedMotion ? 'blur-[var(--viewer-blur-reduced)]' : 'blur-[var(--viewer-blur)]',
-          ].join(' ')}
-        />
-      ) : null}
+      {/* Blurred photograph — crossfades immediately when the selection changes */}
+      <div className="absolute inset-0 overflow-hidden">
+        <AnimatePresence initial={false}>
+          {src ? (
+            <motion.img
+              key={src}
+              src={src}
+              alt=""
+              aria-hidden
+              decoding="async"
+              draggable={false}
+              className={[
+                'absolute inset-0 h-full w-full object-cover',
+                'scale-[1.18] saturate-[0.55] contrast-[0.95]',
+                reducedMotion
+                  ? 'blur-[var(--viewer-blur-reduced)]'
+                  : 'blur-[var(--viewer-blur)]',
+              ].join(' ')}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: crossfadeMs, ease: ease.standard }}
+            />
+          ) : null}
+        </AnimatePresence>
+      </div>
 
-      {/* Dark veil — keeps the room quiet */}
-      <div
-        className="absolute inset-0 bg-[color:var(--viewer)]"
-        style={{ opacity: 'var(--viewer-veil)' }}
-      />
-
-      {/* Dominant tint slot — dormant until useDominantColor returns a color */}
+      {/* Dominant tint — between blur and veil so it reads at 3–8% without becoming colorful */}
       {tintColor ? (
-        <div
+        <motion.div
+          key={tintColor}
           className="absolute inset-0"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: strength }}
+          transition={{ duration: crossfadeMs, ease: ease.standard }}
           style={{
             backgroundColor: tintColor,
-            opacity: strength,
             mixBlendMode: 'soft-light',
           }}
         />
       ) : null}
+
+      {/* Dark veil — slightly lighter than before so tint remains perceptible */}
+      <div
+        className="absolute inset-0 bg-[color:var(--viewer)]"
+        style={{ opacity: tintColor ? 0.52 : 'var(--viewer-veil)' }}
+      />
 
       {/* Soft vignette */}
       <div

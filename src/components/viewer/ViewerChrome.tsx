@@ -19,14 +19,14 @@ type ViewerChromeProps = {
   src: string
   current: number
   total: number
+  canPrev: boolean
+  canNext: boolean
   reducedMotion?: boolean
   closeRef?: Ref<HTMLButtonElement>
   downloadRef?: Ref<HTMLAnchorElement>
   onClose: () => void
-  /** Reserved — navigation ships in a later phase */
-  onPrev?: () => void
-  /** Reserved — navigation ships in a later phase */
-  onNext?: () => void
+  onPrev: () => void
+  onNext: () => void
   /** Reserved — metadata panel ships later */
   onInfo?: () => void
   onChromeFocus: () => void
@@ -43,6 +43,8 @@ export function ViewerChrome({
   src,
   current,
   total,
+  canPrev,
+  canNext,
   reducedMotion = false,
   closeRef,
   downloadRef,
@@ -72,7 +74,7 @@ export function ViewerChrome({
       >
         <IconLink
           ref={downloadRef}
-          aria-label={`Download ${filename}`}
+          aria-label={`Download original ${filename}`}
           href={src}
           download={filename}
           className="bg-[color:var(--toolbar)] text-[color:var(--text)] backdrop-blur-sm"
@@ -104,6 +106,7 @@ export function ViewerChrome({
         <IconButton
           aria-label="Previous photograph"
           onClick={onPrev}
+          disabled={!canPrev}
           className="text-[color:var(--text)]"
         >
           <IoChevronBackOutline size={22} aria-hidden />
@@ -112,6 +115,7 @@ export function ViewerChrome({
         <IconButton
           aria-label="Next photograph"
           onClick={onNext}
+          disabled={!canNext}
           className="text-[color:var(--text)]"
         >
           <IoChevronForwardOutline size={22} aria-hidden />

@@ -79,7 +79,9 @@ function ImageCardComponent({
       }
 
   const layoutId =
-    item && !reducedMotion && status === 'loaded' ? photoLayoutId(item.id) : undefined
+    item && !reducedMotion && status === 'loaded' && !isOpen
+      ? photoLayoutId(item.id)
+      : undefined
 
   return (
     <div
