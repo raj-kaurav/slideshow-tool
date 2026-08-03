@@ -93,6 +93,7 @@ function ImageCardComponent({
         ...(hideUntilRevealed ? {} : { [REVEALED_ATTR]: '' }),
       }}
       className="h-full w-full will-change-transform"
+      aria-busy={showSkeleton || undefined}
     >
       <div data-parallax-cell="" className="h-full w-full">
         <fm.div
